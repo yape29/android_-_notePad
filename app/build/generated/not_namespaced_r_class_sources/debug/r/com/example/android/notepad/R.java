@@ -257,15 +257,16 @@ public final class R {
     public static final int android_close=0x7f040001;
     public static final int android_done=0x7f040002;
     public static final int android_more=0x7f040003;
-    public static final int app_notes=0x7f040004;
-    public static final int fab_bg_mini=0x7f040005;
-    public static final int fab_bg_normal=0x7f040006;
-    public static final int ic_menu_compose=0x7f040007;
-    public static final int ic_menu_delete=0x7f040008;
-    public static final int ic_menu_edit=0x7f040009;
-    public static final int ic_menu_revert=0x7f04000a;
-    public static final int ic_menu_save=0x7f04000b;
-    public static final int live_folder_notes=0x7f04000c;
+    public static final int android_search=0x7f040004;
+    public static final int app_notes=0x7f040005;
+    public static final int fab_bg_mini=0x7f040006;
+    public static final int fab_bg_normal=0x7f040007;
+    public static final int ic_menu_compose=0x7f040008;
+    public static final int ic_menu_delete=0x7f040009;
+    public static final int ic_menu_edit=0x7f04000a;
+    public static final int ic_menu_revert=0x7f04000b;
+    public static final int ic_menu_save=0x7f04000c;
+    public static final int live_folder_notes=0x7f04000d;
   }
   public static final class id {
     public static final int add_note=0x7f050000;
@@ -288,9 +289,9 @@ public final class R {
     public static final int mini=0x7f050011;
     public static final int normal=0x7f050012;
     public static final int note=0x7f050013;
-    public static final int ok=0x7f050014;
-    public static final int right=0x7f050015;
-    public static final int save_note=0x7f050016;
+    public static final int right=0x7f050014;
+    public static final int save_note=0x7f050015;
+    public static final int search_note=0x7f050016;
     public static final int textDate=0x7f050017;
     public static final int textTitle=0x7f050018;
     public static final int title=0x7f050019;
@@ -300,7 +301,6 @@ public final class R {
     public static final int note_editor=0x7f060000;
     public static final int notelist_item4=0x7f060001;
     public static final int notelist_main=0x7f060002;
-    public static final int title_editor=0x7f060003;
   }
   public static final class menu {
     public static final int editor_options_menu=0x7f070000;

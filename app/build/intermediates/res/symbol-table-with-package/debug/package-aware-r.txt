@@ -50,6 +50,7 @@ drawable android_add
 drawable android_close
 drawable android_done
 drawable android_more
+drawable android_search
 drawable app_notes
 drawable fab_bg_mini
 drawable fab_bg_normal
@@ -79,9 +80,9 @@ id menu_save
 id mini
 id normal
 id note
-id ok
 id right
 id save_note
+id search_note
 id textDate
 id textTitle
 id title
@@ -89,7 +90,6 @@ id up
 layout note_editor
 layout notelist_item4
 layout notelist_main
-layout title_editor
 menu editor_options_menu
 menu list_context_menu
 menu list_options_menu

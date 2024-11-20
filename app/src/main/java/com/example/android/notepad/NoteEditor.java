@@ -252,7 +252,7 @@ public class NoteEditor extends Activity {
             public void onClick(View v) {
                 String text = mText.getText().toString();
                 String title = mTitle.getText().toString();
-                Log.v("title:",title);
+                Log.v("title:", title);
                 updateNote(text, title);
                 finish();
             }
@@ -432,7 +432,7 @@ public class NoteEditor extends Activity {
 
         // If the action is to insert a new note, this creates an initial title for it.
         if (title == null || title.equals("")) {
-            Log.v("title:",title);
+            Log.v("title:", title);
             title = "空标题";
         }
         values.put(NotePad.Notes.COLUMN_NAME_TITLE, title);

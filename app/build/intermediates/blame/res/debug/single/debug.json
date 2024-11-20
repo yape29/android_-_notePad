@@ -112,12 +112,12 @@
         "source": "D:\\CodingPlace\\Android_workplace\\NotePad_new-master\\app\\src\\main\\res\\drawable\\ic_menu_revert.png"
     },
     {
-        "merged": "D:\\CodingPlace\\Android_workplace\\NotePad_new-master\\app\\build\\intermediates\\res\\merged\\debug\\drawable_ic_menu_save.png.flat",
-        "source": "D:\\CodingPlace\\Android_workplace\\NotePad_new-master\\app\\src\\main\\res\\drawable\\ic_menu_save.png"
+        "merged": "D:\\CodingPlace\\Android_workplace\\NotePad_new-master\\app\\build\\intermediates\\res\\merged\\debug\\drawable_android_search.png.flat",
+        "source": "D:\\CodingPlace\\Android_workplace\\NotePad_new-master\\app\\src\\main\\res\\drawable\\android_search.png"
     },
     {
-        "merged": "D:\\CodingPlace\\Android_workplace\\NotePad_new-master\\app\\build\\intermediates\\res\\merged\\debug\\layout_title_editor.xml.flat",
-        "source": "D:\\CodingPlace\\Android_workplace\\NotePad_new-master\\app\\src\\main\\res\\layout\\title_editor.xml"
+        "merged": "D:\\CodingPlace\\Android_workplace\\NotePad_new-master\\app\\build\\intermediates\\res\\merged\\debug\\drawable_ic_menu_save.png.flat",
+        "source": "D:\\CodingPlace\\Android_workplace\\NotePad_new-master\\app\\src\\main\\res\\drawable\\ic_menu_save.png"
     },
     {
         "merged": "D:\\CodingPlace\\Android_workplace\\NotePad_new-master\\app\\build\\intermediates\\res\\merged\\debug\\drawable-ldpi_live_folder_notes.png.flat",
