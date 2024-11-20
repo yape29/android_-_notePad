@@ -32,6 +32,8 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
+import android.util.SparseBooleanArray;
+import android.view.ActionMode;
 import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -39,10 +41,13 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
+
+import androidx.cardview.widget.CardView;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -99,6 +104,7 @@ public class NotesList extends ListActivity {
                 startActivity(intent);
             }
         });
+
         // The user does not need to hold down the key to use menu shortcuts.
         // 用户无需按住该键即可使用菜单快捷方式。
         setDefaultKeyMode(DEFAULT_KEYS_SHORTCUT);
@@ -157,8 +163,8 @@ public class NotesList extends ListActivity {
                 R.id.textDate};
 
         // Creates the backing adapter for the ListView.
-        SimpleCursorAdapter adapter
-            = new SimpleCursorAdapter(
+        final MyAdapter adapter
+            = new MyAdapter(
                       this,                             // The Context for the ListView
                       R.layout.notelist_item4,          // Points to the XML for a list item
                       cursor,                           // The cursor to get items from
@@ -168,6 +174,65 @@ public class NotesList extends ListActivity {
 
         // Sets the ListView's adapter to be the cursor adapter that was just created.
         setListAdapter(adapter);
+
+        // 设置多选模式
+        final ListView listView = getListView();
+        listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
+
+        listView.setMultiChoiceModeListener(new AbsListView.MultiChoiceModeListener() {
+            @Override
+            public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) {
+                adapter.setItemSelected(position, checked);
+
+                int checkedCount = listView.getCheckedItemCount();
+                if (checkedCount > 0) {
+                    findViewById(R.id.delete_notes).setVisibility(View.VISIBLE);
+                } else {
+                    findViewById(R.id.delete_notes).setVisibility(View.GONE);
+                }
+
+                mode.setTitle(checkedCount + " selected");
+            }
+
+            @Override
+            public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+                return true; // 不需要显示菜单
+            }
+
+            @Override
+            public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+                return false;
+            }
+
+            @Override
+            public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+                return false;
+            }
+
+            @Override
+            public void onDestroyActionMode(ActionMode mode) {
+            }
+        });
+
+        final FloatingActionButton fabDelete = (FloatingActionButton) findViewById(R.id.delete_notes);
+        // 设置删除按钮点击事件
+        fabDelete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                SparseBooleanArray checkedItems = listView.getCheckedItemPositions();
+                for (int i = 0; i < checkedItems.size(); i++) {
+                    int position = checkedItems.keyAt(i);
+                    if (checkedItems.valueAt(i)) {
+                        Cursor selectedCursor = (Cursor) adapter.getItem(position);
+                        long noteId = selectedCursor.getLong(selectedCursor.getColumnIndex(NotePad.Notes._ID));
+                        Uri uri = ContentUris.withAppendedId(NotePad.Notes.CONTENT_URI, noteId);
+                        getContentResolver().delete(uri, null, null);
+                    }
+                }
+                adapter.clearSelection(); // 清空选中状态
+                fabDelete.setVisibility(View.GONE);
+            }
+        });
         // 设置自定义视图绑定器，用于修改时间格式显示。这里使用内部类来实现SimpleCursorAdapter.ViewBinder接口。
         adapter.setViewBinder(new SimpleCursorAdapter.ViewBinder() {
             @Override

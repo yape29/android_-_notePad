@@ -31,6 +31,8 @@ color cardview_dark_background
 color cardview_light_background
 color cardview_shadow_end_color
 color cardview_shadow_start_color
+color default_color
+color selected_color
 dimen cardview_compat_inset_shadow
 dimen cardview_default_elevation
 dimen cardview_default_radius
@@ -58,6 +60,7 @@ drawable ic_menu_revert
 drawable ic_menu_save
 drawable live_folder_notes
 id add_note
+id cardView
 id context_copy
 id context_delete
 id context_open

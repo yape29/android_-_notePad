@@ -22,6 +22,7 @@
         android:id="@+id/delete_notes"
         app:fab_icon="@drawable/android_close"
         app:fab_size="normal"
+        android:visibility="gone"
         tools:ignore="TouchTargetSizeCheck,SpeakableTextPresentCheck"></com.getbase.floatingactionbutton.FloatingActionButton>
 
     <com.getbase.floatingactionbutton.FloatingActionButton
