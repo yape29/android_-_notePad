@@ -62,6 +62,7 @@ id context_copy
 id context_delete
 id context_open
 id delete_note
+id delete_notes
 id down
 id fab_expand_menu_button
 id fab_label

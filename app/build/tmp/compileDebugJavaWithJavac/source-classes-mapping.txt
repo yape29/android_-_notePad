@@ -27,11 +27,10 @@ com/example/android/notepad/R.java
  com.example.android.notepad.R$string
  com.example.android.notepad.R$style
  com.example.android.notepad.R$styleable
-com/example/android/notepad/NoteEditor.java
- com.example.android.notepad.NoteEditor
- com.example.android.notepad.NoteEditor$1
- com.example.android.notepad.NoteEditor$2
- com.example.android.notepad.NoteEditor$LinedEditText
+com/example/android/notepad/NotesList.java
+ com.example.android.notepad.NotesList
+ com.example.android.notepad.NotesList$1
+ com.example.android.notepad.NotesList$2
 com/example/android/notepad/NotesLiveFolder.java
  com.example.android.notepad.NotesLiveFolder
 com/getbase/floatingactionbutton/R.java
@@ -41,7 +40,8 @@ com/getbase/floatingactionbutton/R.java
  com.getbase.floatingactionbutton.R$drawable
  com.getbase.floatingactionbutton.R$id
  com.getbase.floatingactionbutton.R$styleable
-com/example/android/notepad/NotesList.java
- com.example.android.notepad.NotesList
- com.example.android.notepad.NotesList$1
- com.example.android.notepad.NotesList$2
+com/example/android/notepad/NoteEditor.java
+ com.example.android.notepad.NoteEditor
+ com.example.android.notepad.NoteEditor$1
+ com.example.android.notepad.NoteEditor$2
+ com.example.android.notepad.NoteEditor$LinedEditText

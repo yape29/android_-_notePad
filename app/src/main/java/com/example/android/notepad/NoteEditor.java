@@ -262,6 +262,7 @@ public class NoteEditor extends Activity {
             public void onClick(View v) {
                 String text = mText.getText().toString();
                 String title = mTitle.getText().toString();
+                Log.v("title:",title);
                 updateNote(text, title);
                 finish();
             }
@@ -397,6 +398,7 @@ public class NoteEditor extends Activity {
 
             // Get the current note text.
             String text = mText.getText().toString();
+            String title = mTitle.getText().toString();
             int length = text.length();
 
             /*
@@ -417,9 +419,9 @@ public class NoteEditor extends Activity {
                  */
             } else if (mState == STATE_EDIT) {
                 // Creates a map to contain the new values for the columns
-                updateNote(text, null);
+                updateNote(text, title);
             } else if (mState == STATE_INSERT) {
-                updateNote(text, text);
+                updateNote(text, title);
                 mState = STATE_EDIT;
             }
         }
@@ -583,34 +585,11 @@ public class NoteEditor extends Activity {
         values.put(NotePad.Notes.COLUMN_NAME_MODIFICATION_DATE, System.currentTimeMillis());
 
         // If the action is to insert a new note, this creates an initial title for it.
-        if (mState == STATE_INSERT) {
-
-            // If no title was provided as an argument, create one from the note text.
-            if (title == null) {
-
-                // Get the note's length
-                int length = text.length();
-
-                // Sets the title by getting a substring of the text that is 31 characters long
-                // or the number of characters in the note plus one, whichever is smaller.
-                title = text.substring(0, Math.min(30, length));
-
-                // If the resulting length is more than 30 characters, chops off any
-                // trailing spaces
-                if (length > 30) {
-                    int lastSpace = title.lastIndexOf(' ');
-                    if (lastSpace > 0) {
-                        title = title.substring(0, lastSpace);
-                    }
-                }
-            }
-            // In the values map, sets the value of the title
-            values.put(NotePad.Notes.COLUMN_NAME_TITLE, title);
-        } else if (title != null) {
-            // In the values map, sets the value of the title
-            values.put(NotePad.Notes.COLUMN_NAME_TITLE, title);
+        if (title == null || title.equals("")) {
+            Log.v("title:",title);
+            title = "空标题";
         }
-
+        values.put(NotePad.Notes.COLUMN_NAME_TITLE, title);
         // This puts the desired notes text into the map.
         values.put(NotePad.Notes.COLUMN_NAME_NOTE, text);
 
