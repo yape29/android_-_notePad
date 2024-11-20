@@ -1,0 +1,9 @@
+com/example/android/notepad/NotePadActivityTest.java
+ com.example.android.notepad.NotePadActivityTest
+com/example/android/notepad/tests/R.java
+ com.example.android.notepad.tests.R
+com/example/android/notepad/tests/BuildConfig.java
+ com.example.android.notepad.tests.BuildConfig
+com/example/android/notepad/NotePadProviderTest.java
+ com.example.android.notepad.NotePadProviderTest
+ com.example.android.notepad.NotePadProviderTest$NoteInfo

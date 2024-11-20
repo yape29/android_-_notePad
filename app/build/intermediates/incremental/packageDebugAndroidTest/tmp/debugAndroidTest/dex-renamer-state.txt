@@ -1,0 +1,4 @@
+#Wed Oct 23 17:18:35 CST 2024
+base.0=E\:\\Android_tiange\\NotePad11\\app\\build\\intermediates\\dex\\debugAndroidTest\\mergeDexDebugAndroidTest\\out
+renamed.0=classes.dex
+path.0=classes.dex
