@@ -48,10 +48,6 @@
         "source": "C:\\Users\\peng\\.gradle\\caches\\transforms-2\\files-2.1\\3b22ec12577bcfa2219e21f886bd1b7e\\floatingactionbutton-1.10.1\\res\\drawable-xhdpi-v4\\fab_bg_mini.png"
     },
     {
-        "merged": "D:\\CodingPlace\\Android_workplace\\NotePad_new-master\\app\\build\\intermediates\\res\\merged\\debug\\layout_notelist_item2.xml.flat",
-        "source": "D:\\CodingPlace\\Android_workplace\\NotePad_new-master\\app\\src\\main\\res\\layout\\notelist_item2.xml"
-    },
-    {
         "merged": "D:\\CodingPlace\\Android_workplace\\NotePad_new-master\\app\\build\\intermediates\\res\\merged\\debug\\drawable_android_add.png.flat",
         "source": "D:\\CodingPlace\\Android_workplace\\NotePad_new-master\\app\\src\\main\\res\\drawable\\android_add.png"
     },
@@ -104,16 +100,12 @@
         "source": "C:\\Users\\peng\\.gradle\\caches\\transforms-2\\files-2.1\\3b22ec12577bcfa2219e21f886bd1b7e\\floatingactionbutton-1.10.1\\res\\drawable-xhdpi-v4\\fab_bg_normal.png"
     },
     {
-        "merged": "D:\\CodingPlace\\Android_workplace\\NotePad_new-master\\app\\build\\intermediates\\res\\merged\\debug\\drawable-xxhdpi-v4_fab_bg_mini.png.flat",
-        "source": "C:\\Users\\peng\\.gradle\\caches\\transforms-2\\files-2.1\\3b22ec12577bcfa2219e21f886bd1b7e\\floatingactionbutton-1.10.1\\res\\drawable-xxhdpi-v4\\fab_bg_mini.png"
-    },
-    {
         "merged": "D:\\CodingPlace\\Android_workplace\\NotePad_new-master\\app\\build\\intermediates\\res\\merged\\debug\\drawable_android_done.png.flat",
         "source": "D:\\CodingPlace\\Android_workplace\\NotePad_new-master\\app\\src\\main\\res\\drawable\\android_done.png"
     },
     {
-        "merged": "D:\\CodingPlace\\Android_workplace\\NotePad_new-master\\app\\build\\intermediates\\res\\merged\\debug\\layout_noteslist_item.xml.flat",
-        "source": "D:\\CodingPlace\\Android_workplace\\NotePad_new-master\\app\\src\\main\\res\\layout\\noteslist_item.xml"
+        "merged": "D:\\CodingPlace\\Android_workplace\\NotePad_new-master\\app\\build\\intermediates\\res\\merged\\debug\\drawable-xxhdpi-v4_fab_bg_mini.png.flat",
+        "source": "C:\\Users\\peng\\.gradle\\caches\\transforms-2\\files-2.1\\3b22ec12577bcfa2219e21f886bd1b7e\\floatingactionbutton-1.10.1\\res\\drawable-xxhdpi-v4\\fab_bg_mini.png"
     },
     {
         "merged": "D:\\CodingPlace\\Android_workplace\\NotePad_new-master\\app\\build\\intermediates\\res\\merged\\debug\\drawable_ic_menu_revert.png.flat",
@@ -122,10 +114,6 @@
     {
         "merged": "D:\\CodingPlace\\Android_workplace\\NotePad_new-master\\app\\build\\intermediates\\res\\merged\\debug\\drawable_ic_menu_save.png.flat",
         "source": "D:\\CodingPlace\\Android_workplace\\NotePad_new-master\\app\\src\\main\\res\\drawable\\ic_menu_save.png"
-    },
-    {
-        "merged": "D:\\CodingPlace\\Android_workplace\\NotePad_new-master\\app\\build\\intermediates\\res\\merged\\debug\\layout_notelist_item3.xml.flat",
-        "source": "D:\\CodingPlace\\Android_workplace\\NotePad_new-master\\app\\src\\main\\res\\layout\\notelist_item3.xml"
     },
     {
         "merged": "D:\\CodingPlace\\Android_workplace\\NotePad_new-master\\app\\build\\intermediates\\res\\merged\\debug\\layout_title_editor.xml.flat",

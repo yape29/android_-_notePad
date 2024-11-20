@@ -87,11 +87,8 @@ id textTitle
 id title
 id up
 layout note_editor
-layout notelist_item2
-layout notelist_item3
 layout notelist_item4
 layout notelist_main
-layout noteslist_item
 layout title_editor
 menu editor_options_menu
 menu list_context_menu
