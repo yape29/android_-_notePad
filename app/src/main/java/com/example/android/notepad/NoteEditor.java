@@ -577,7 +577,6 @@ public class NoteEditor extends Activity {
      * @param text  The new note contents to use.
      * @param title The new note title to use
      */
-    // todo 保存
     private final void updateNote(String text, String title) {
 
         // Sets up a map to contain values to be updated in the provider.
@@ -639,7 +638,6 @@ public class NoteEditor extends Activity {
     /**
      * Take care of deleting a note.  Simply deletes the entry.
      */
-    // todo 删除
     private final void deleteNote() {
         if (mCursor != null) {
             mCursor.close();
