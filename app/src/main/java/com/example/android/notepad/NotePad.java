@@ -140,6 +140,14 @@ public final class NotePad {
         public static final String COLUMN_NAME_NOTE = "note";
 
         /**
+         *  收藏字段
+         *  <p>0 -> 未收藏
+         *     1 -> 收藏
+         *  </p>
+         */
+        public static final String COLUMN_NAME_STAR = "star";
+
+        /**
          * Column name for the creation timestamp
          * <P>Type: INTEGER (long from System.curentTimeMillis())</P>
          */

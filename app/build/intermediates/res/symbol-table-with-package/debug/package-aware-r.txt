@@ -50,8 +50,12 @@ drawable android_add
 drawable android_close
 drawable android_done
 drawable android_more
+drawable android_not_star
+drawable android_notstar
 drawable android_search
 drawable android_search2
+drawable android_show_star
+drawable android_star
 drawable app_notes
 drawable fab_bg_mini
 drawable fab_bg_normal
@@ -73,6 +77,7 @@ id down
 id fab_expand_menu_button
 id fab_label
 id fab_menu
+id favoriteButton
 id left
 id list_show
 id menu_add
@@ -88,6 +93,7 @@ id save_note
 id search_bar
 id search_button
 id search_note
+id show_star_note
 id textDate
 id textTitle
 id title

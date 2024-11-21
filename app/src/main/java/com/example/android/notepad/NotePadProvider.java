@@ -63,7 +63,7 @@ public class NotePadProvider extends ContentProvider implements PipeDataWriter<C
     /**
      * The database version
      */
-    private static final int DATABASE_VERSION = 2;
+    private static final int DATABASE_VERSION = 3;
 
     /**
      * A projection map used to select columns from the database
@@ -144,8 +144,9 @@ public class NotePadProvider extends ContentProvider implements PipeDataWriter<C
         // Maps "title" to "title"
         sNotesProjectionMap.put(NotePad.Notes.COLUMN_NAME_TITLE, NotePad.Notes.COLUMN_NAME_TITLE);
 
-        // Maps "note" to "note"
+        // Maps "star" to "star"
         sNotesProjectionMap.put(NotePad.Notes.COLUMN_NAME_NOTE, NotePad.Notes.COLUMN_NAME_NOTE);
+        sNotesProjectionMap.put(NotePad.Notes.COLUMN_NAME_STAR, NotePad.Notes.COLUMN_NAME_STAR);
 
         // Maps "created" to "created"
         sNotesProjectionMap.put(NotePad.Notes.COLUMN_NAME_CREATE_DATE,
@@ -196,7 +197,8 @@ public class NotePadProvider extends ContentProvider implements PipeDataWriter<C
                    + NotePad.Notes.COLUMN_NAME_TITLE + " TEXT,"
                    + NotePad.Notes.COLUMN_NAME_NOTE + " TEXT,"
                    + NotePad.Notes.COLUMN_NAME_CREATE_DATE + " INTEGER,"
-                   + NotePad.Notes.COLUMN_NAME_MODIFICATION_DATE + " INTEGER"
+                   + NotePad.Notes.COLUMN_NAME_MODIFICATION_DATE + " INTEGER,"
+                   + NotePad.Notes.COLUMN_NAME_STAR + " INTEGER DEFAULT 0"    // 新增收藏字段，默认为0，未被收藏
                    + ");");
        }
 
@@ -215,10 +217,14 @@ public class NotePadProvider extends ContentProvider implements PipeDataWriter<C
                    + newVersion + ", which will destroy all old data");
 
            // Kills the table and existing data
-           db.execSQL("DROP TABLE IF EXISTS notes");
+           //db.execSQL("DROP TABLE IF EXISTS notes");
 
            // Recreates the database with a new version
-           onCreate(db);
+           //if (oldVersion < 2) {  // 假设数据库版本号从1升到2
+               String addColumnQuery = "ALTER TABLE " + NotePad.Notes.TABLE_NAME + " ADD COLUMN " + NotePad.Notes.COLUMN_NAME_STAR + " INTEGER DEFAULT 0";
+               db.execSQL(addColumnQuery);
+           //}
+           //onCreate(db);
        }
    }
 
@@ -539,6 +545,13 @@ public class NotePadProvider extends ContentProvider implements PipeDataWriter<C
         if (values.containsKey(NotePad.Notes.COLUMN_NAME_NOTE) == false) {
             values.put(NotePad.Notes.COLUMN_NAME_NOTE, "");
         }
+
+        // 如果未包含收藏字段，将其设置为0，未收藏
+        if (!values.containsKey(NotePad.Notes.COLUMN_NAME_STAR)) {
+            values.put(NotePad.Notes.COLUMN_NAME_STAR, 0); // 默认未收藏
+        }
+
+
 
         // Opens the database object in "write" mode.
         SQLiteDatabase db = mOpenHelper.getWritableDatabase();

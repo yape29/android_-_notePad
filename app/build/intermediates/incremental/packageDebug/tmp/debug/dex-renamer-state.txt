@@ -1,4 +1,4 @@
-#Thu Nov 21 19:54:36 CST 2024
+#Thu Nov 21 23:17:57 CST 2024
 base.0=D\:\\CodingPlace\\Android_workplace\\NotePad_new-master\\app\\build\\intermediates\\dex\\debug\\mergeDexDebug\\out\\classes.dex
 path.0=classes.dex
 renamed.0=classes.dex

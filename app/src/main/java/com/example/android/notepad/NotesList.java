@@ -17,6 +17,7 @@
 package com.example.android.notepad;
 
 import static com.example.android.notepad.NotePad.Notes.COLUMN_NAME_MODIFICATION_DATE;
+import static com.example.android.notepad.NotePad.Notes.COLUMN_NAME_STAR;
 
 import com.example.android.notepad.NotePad;
 import com.getbase.floatingactionbutton.FloatingActionButton;
@@ -84,6 +85,7 @@ public class NotesList extends ListActivity {
             NotePad.Notes._ID, // 0
             NotePad.Notes.COLUMN_NAME_TITLE, // 1
             COLUMN_NAME_MODIFICATION_DATE,
+            NotePad.Notes.COLUMN_NAME_STAR
     };
 
     /** The index of the title column */
@@ -112,7 +114,6 @@ public class NotesList extends ListActivity {
 
         // 搜索note
         // 显示搜索框
-        // todo:搜索框不显示
         final FloatingActionButton showSearchBtn = (FloatingActionButton) findViewById(R.id.search_note);
         final CardView searchCardView = (CardView) findViewById(R.id.search_bar);
         showSearchBtn.setOnClickListener(new View.OnClickListener() {
@@ -170,13 +171,13 @@ public class NotesList extends ListActivity {
          *
          * Please see the introductory note about performing provider operations on the UI thread.
          */
-        Cursor cursor = managedQuery(
-            getIntent().getData(),            // Use the default content URI for the provider.
-            PROJECTION,                       // Return the note ID and title for each note.
-            null,                             // No where clause, return all records.
-            null,                             // No where clause, therefore no where column values.
-            NotePad.Notes.DEFAULT_SORT_ORDER  // Use the default sort order.
-        );
+        final Cursor[] cursor = {managedQuery(
+                getIntent().getData(),            // Use the default content URI for the provider.
+                PROJECTION,                       // Return the note ID and title for each note.
+                null,                             // No where clause, return all records.
+                null,                             // No where clause, therefore no where column values.
+                NotePad.Notes.DEFAULT_SORT_ORDER  // Use the default sort order.
+        )};
 
         /*
          * The following two arrays create a "map" between columns in the cursor and view IDs
@@ -199,7 +200,7 @@ public class NotesList extends ListActivity {
             = new MyAdapter(
                       this,                             // The Context for the ListView
                       R.layout.notelist_item4,          // Points to the XML for a list item
-                      cursor,                           // The cursor to get items from
+                cursor[0],                           // The cursor to get items from
                       dataColumns,
                       viewIDs
               );
@@ -265,6 +266,43 @@ public class NotesList extends ListActivity {
                 fabDelete.setVisibility(View.GONE);
             }
         });
+        // 添加一个变量来标识当前是否只显示收藏的 notes
+        final boolean[] isShowingFavorites = {false};
+
+        // 收藏按钮事件
+        final FloatingActionButton showStarNote = (FloatingActionButton) findViewById(R.id.show_star_note);
+        showStarNote.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (isShowingFavorites[0]) {
+                    // 如果当前显示的是收藏的笔记，点击后切换到显示全部笔记
+                    isShowingFavorites[0] = false;
+                    // 查询所有的 notes
+                    cursor[0] = managedQuery(
+                            getIntent().getData(), // 默认 URI
+                            PROJECTION, // 显示的列
+                            null, // 不加筛选条件，查询所有
+                            null, // 参数为空
+                            NotePad.Notes.DEFAULT_SORT_ORDER // 排序
+                    );
+                } else {
+                    // 如果当前显示的是所有笔记，点击后切换到只显示收藏的笔记
+                    isShowingFavorites[0] = true;
+                    // 查询只显示收藏的 notes (假设 star = 1 表示已收藏)
+                    cursor[0] = managedQuery(
+                            getIntent().getData(), // 默认 URI
+                            PROJECTION, // 显示的列
+                            NotePad.Notes.COLUMN_NAME_STAR + " = ?", // 筛选条件，star = 1
+                            new String[] { "1" }, // 只获取收藏的笔记
+                            NotePad.Notes.DEFAULT_SORT_ORDER // 排序
+                    );
+                }
+
+                // 更新 ListView 的数据
+                adapter.changeCursor(cursor[0]);
+            }
+        });
+
         // 设置自定义视图绑定器，用于修改时间格式显示。这里使用内部类来实现SimpleCursorAdapter.ViewBinder接口。
         adapter.setViewBinder(new SimpleCursorAdapter.ViewBinder() {
             @Override
