@@ -31,6 +31,8 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.util.SparseBooleanArray;
 import android.view.ActionMode;
@@ -38,11 +40,14 @@ import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
+import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
@@ -102,6 +107,34 @@ public class NotesList extends ListActivity {
                 // Launch NoteEditor to add a new note
                 Intent intent = new Intent(Intent.ACTION_INSERT, NotePad.Notes.CONTENT_URI);
                 startActivity(intent);
+            }
+        });
+
+        // 搜索note
+        // 显示搜索框
+        // todo:搜索框不显示
+        final FloatingActionButton showSearchBtn = (FloatingActionButton) findViewById(R.id.search_note);
+        final CardView searchCardView = (CardView) findViewById(R.id.search_bar);
+        showSearchBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (searchCardView.getVisibility() == View.GONE){
+                    searchCardView.setVisibility(View.VISIBLE);  // 显示搜索框
+
+                }else {
+                    searchCardView.setVisibility(View.GONE);
+                }
+            }
+        });
+
+        // 设置搜索按钮点击事件
+        final EditText searchEditText = (EditText) findViewById(R.id.title_search);
+        ImageButton searchBtn = (ImageButton) findViewById(R.id.search_button);
+        searchBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String query = searchEditText.getText().toString().trim();
+                searchNotes(query); // 执行搜索
             }
         });
 
@@ -265,7 +298,52 @@ public class NotesList extends ListActivity {
             }
         });
     }
+    private void getNotes(String query) {
+        String selection = null;
+        String[] selectionArgs = null;
 
+        if (query != null && !query.isEmpty()) {
+            selection = NotePad.Notes.COLUMN_NAME_TITLE + " LIKE ?";
+            selectionArgs = new String[] { "%" + query + "%" };
+        }
+
+        // 执行查询，获取所有笔记
+        Cursor cursor = getContentResolver().query(
+                NotePad.Notes.CONTENT_URI,
+                PROJECTION,
+                selection,
+                selectionArgs,
+                NotePad.Notes.DEFAULT_SORT_ORDER
+        );
+
+        // 更新适配器
+        MyAdapter adapter = (MyAdapter) getListAdapter();
+        adapter.changeCursor(cursor);
+    }
+    private void searchNotes(String query) {
+        // 如果输入为空，显示所有笔记
+        if (query.isEmpty()) {
+            getNotes(null);
+            return;
+        }
+
+        // 构建查询条件
+        String selection = NotePad.Notes.COLUMN_NAME_TITLE + " LIKE ?";
+        String[] selectionArgs = new String[] { "%" + query + "%" };
+
+        // 执行查询，获取匹配的数据
+        Cursor cursor = getContentResolver().query(
+                NotePad.Notes.CONTENT_URI,
+                PROJECTION,
+                selection,
+                selectionArgs,
+                NotePad.Notes.DEFAULT_SORT_ORDER
+        );
+
+        // 更新适配器的数据
+        MyAdapter adapter = (MyAdapter) getListAdapter();
+        adapter.changeCursor(cursor);
+    }
     /**
      * This method is called when the user clicks a note in the displayed list.
      *

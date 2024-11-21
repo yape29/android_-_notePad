@@ -47,3 +47,5 @@ com/example/android/notepad/NotesList.java
  com.example.android.notepad.NotesList$2
  com.example.android.notepad.NotesList$3
  com.example.android.notepad.NotesList$4
+ com.example.android.notepad.NotesList$5
+ com.example.android.notepad.NotesList$6
