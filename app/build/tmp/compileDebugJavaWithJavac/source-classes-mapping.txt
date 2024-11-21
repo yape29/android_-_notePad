@@ -6,8 +6,8 @@ com/example/android/notepad/BuildConfig.java
 com/example/android/notepad/NotePad.java
  com.example.android.notepad.NotePad
  com.example.android.notepad.NotePad$Notes
-com/example/android/notepad/TitleEditor.java
- com.example.android.notepad.TitleEditor
+com/example/android/notepad/MyAdapter.java
+ com.example.android.notepad.MyAdapter
 androidx/cardview/R.java
  androidx.cardview.R
  androidx.cardview.R$attr
@@ -41,11 +41,11 @@ com/getbase/floatingactionbutton/R.java
  com.getbase.floatingactionbutton.R$drawable
  com.getbase.floatingactionbutton.R$id
  com.getbase.floatingactionbutton.R$styleable
-com/example/android/notepad/MyAdapter.java
- com.example.android.notepad.MyAdapter
 com/example/android/notepad/NotesList.java
  com.example.android.notepad.NotesList
  com.example.android.notepad.NotesList$1
  com.example.android.notepad.NotesList$2
  com.example.android.notepad.NotesList$3
  com.example.android.notepad.NotesList$4
+ com.example.android.notepad.NotesList$5
+ com.example.android.notepad.NotesList$6

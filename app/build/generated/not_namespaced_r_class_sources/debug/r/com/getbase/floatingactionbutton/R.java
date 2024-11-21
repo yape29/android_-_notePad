@@ -46,8 +46,8 @@ public final class R {
     public static final class drawable {
         private drawable() {}
 
-        public static final int fab_bg_mini = 0x7f040005;
-        public static final int fab_bg_normal = 0x7f040006;
+        public static final int fab_bg_mini = 0x7f040007;
+        public static final int fab_bg_normal = 0x7f040008;
     }
     public static final class id {
         private id() {}
@@ -56,10 +56,10 @@ public final class R {
         public static final int fab_expand_menu_button = 0x7f050008;
         public static final int fab_label = 0x7f050009;
         public static final int left = 0x7f05000b;
-        public static final int mini = 0x7f050011;
-        public static final int normal = 0x7f050012;
+        public static final int mini = 0x7f050012;
+        public static final int normal = 0x7f050013;
         public static final int right = 0x7f050015;
-        public static final int up = 0x7f05001a;
+        public static final int up = 0x7f05001e;
     }
     public static final class styleable {
         private styleable() {}

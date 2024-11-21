@@ -240,34 +240,24 @@ public class NoteEditor extends Activity {
                 null          // Use the default sort order (modification date, descending)
         );
 
-        // For a paste, initializes the data from clipboard.
-        // (Must be done after mCursor is initialized.)
-        if (Intent.ACTION_PASTE.equals(action)) {
-            // Does the paste
-            performPaste();
-            // Switches the state to EDIT so the title can be modified.
-            mState = STATE_EDIT;
-        }
-
-
         setContentView(R.layout.note_editor);
 
         // Gets a handle to the EditText in the the layout.
         mText = (EditText) findViewById(R.id.note);
         mTitle = (EditText) findViewById(R.id.title);
-        // 保存
+        // 保存按钮
         FloatingActionButton fabSaveNote = (FloatingActionButton) findViewById(R.id.save_note);
         fabSaveNote.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 String text = mText.getText().toString();
                 String title = mTitle.getText().toString();
-                Log.v("title:",title);
+                Log.v("title:", title);
                 updateNote(text, title);
                 finish();
             }
         });
-        // 删除
+        // 删除按钮
         FloatingActionButton fabDeleteNote = (FloatingActionButton) findViewById(R.id.delete_note);
         fabDeleteNote.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -428,150 +418,6 @@ public class NoteEditor extends Activity {
     }
 
     /**
-     * This method is called when the user clicks the device's Menu button the first time for
-     * this Activity. Android passes in a Menu object that is populated with items.
-     * <p>
-     * Builds the menus for editing and inserting, and adds in alternative actions that
-     * registered themselves to handle the MIME types for this application.
-     *
-     * @param menu A Menu object to which items should be added.
-     * @return True to display the menu.
-     */
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate menu from XML resource
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.editor_options_menu, menu);
-
-        // Only add extra menu items for a saved note 
-        if (mState == STATE_EDIT) {
-            // Append to the
-            // menu items for any other activities that can do stuff with it
-            // as well.  This does a query on the system for any activities that
-            // implement the ALTERNATIVE_ACTION for our data, adding a menu item
-            // for each one that is found.
-            Intent intent = new Intent(null, mUri);
-            intent.addCategory(Intent.CATEGORY_ALTERNATIVE);
-            menu.addIntentOptions(Menu.CATEGORY_ALTERNATIVE, 0, 0,
-                    new ComponentName(this, NoteEditor.class), null, intent, 0, null);
-        }
-
-        return super.onCreateOptionsMenu(menu);
-    }
-
-    @Override
-    public boolean onPrepareOptionsMenu(Menu menu) {
-        // Check if note has changed and enable/disable the revert option
-        int colNoteIndex = mCursor.getColumnIndex(NotePad.Notes.COLUMN_NAME_NOTE);
-        String savedNote = mCursor.getString(colNoteIndex);
-        String currentNote = mText.getText().toString();
-        if (savedNote.equals(currentNote)) {
-            menu.findItem(R.id.menu_revert).setVisible(false);
-        } else {
-            menu.findItem(R.id.menu_revert).setVisible(true);
-        }
-        return super.onPrepareOptionsMenu(menu);
-    }
-
-    /**
-     * This method is called when a menu item is selected. Android passes in the selected item.
-     * The switch statement in this method calls the appropriate method to perform the action the
-     * user chose.
-     *
-     * @param item The selected MenuItem
-     * @return True to indicate that the item was processed, and no further work is necessary. False
-     * to proceed to further processing as indicated in the MenuItem object.
-     */
-    // todo:菜单栏
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle all of the possible menu actions.
-        switch (item.getItemId()) {
-            case R.id.menu_save:
-                String text = mText.getText().toString();
-                updateNote(text, mTitle.getText().toString());
-                finish();
-                break;
-            case R.id.menu_delete:
-                deleteNote();
-                finish();
-                break;
-            case R.id.menu_revert:
-                cancelNote();
-                break;
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
-//BEGIN_INCLUDE(paste)
-
-    /**
-     * A helper method that replaces the note's data with the contents of the clipboard.
-     */
-    private final void performPaste() {
-
-        // Gets a handle to the Clipboard Manager
-        ClipboardManager clipboard = (ClipboardManager)
-                getSystemService(Context.CLIPBOARD_SERVICE);
-
-        // Gets a content resolver instance
-        ContentResolver cr = getContentResolver();
-
-        // Gets the clipboard data from the clipboard
-        ClipData clip = clipboard.getPrimaryClip();
-        if (clip != null) {
-
-            String text = null;
-            String title = null;
-
-            // Gets the first item from the clipboard data
-            ClipData.Item item = clip.getItemAt(0);
-
-            // Tries to get the item's contents as a URI pointing to a note
-            Uri uri = item.getUri();
-
-            // Tests to see that the item actually is an URI, and that the URI
-            // is a content URI pointing to a provider whose MIME type is the same
-            // as the MIME type supported by the Note pad provider.
-            if (uri != null && NotePad.Notes.CONTENT_ITEM_TYPE.equals(cr.getType(uri))) {
-
-                // The clipboard holds a reference to data with a note MIME type. This copies it.
-                Cursor orig = cr.query(
-                        uri,            // URI for the content provider
-                        PROJECTION,     // Get the columns referred to in the projection
-                        null,           // No selection variables
-                        null,           // No selection variables, so no criteria are needed
-                        null            // Use the default sort order
-                );
-
-                // If the Cursor is not null, and it contains at least one record
-                // (moveToFirst() returns true), then this gets the note data from it.
-                if (orig != null) {
-                    if (orig.moveToFirst()) {
-                        int colNoteIndex = mCursor.getColumnIndex(NotePad.Notes.COLUMN_NAME_NOTE);
-                        int colTitleIndex = mCursor.getColumnIndex(NotePad.Notes.COLUMN_NAME_TITLE);
-                        text = orig.getString(colNoteIndex);
-                        title = orig.getString(colTitleIndex);
-                    }
-
-                    // Closes the cursor.
-                    orig.close();
-                }
-            }
-
-            // If the contents of the clipboard wasn't a reference to a note, then
-            // this converts whatever it is to text.
-            if (text == null) {
-                text = item.coerceToText(this).toString();
-            }
-
-            // Updates the current note with the retrieved title and text.
-            updateNote(text, title);
-        }
-    }
-//END_INCLUDE(paste)
-
-    /**
      * Replaces the current note contents with the text and title provided as arguments.
      *
      * @param text  The new note contents to use.
@@ -585,7 +431,7 @@ public class NoteEditor extends Activity {
 
         // If the action is to insert a new note, this creates an initial title for it.
         if (title == null || title.equals("")) {
-            Log.v("title:",title);
+            Log.v("title:", title);
             title = "空标题";
         }
         values.put(NotePad.Notes.COLUMN_NAME_TITLE, title);

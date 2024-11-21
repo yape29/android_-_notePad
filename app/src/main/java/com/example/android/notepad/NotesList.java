@@ -112,6 +112,7 @@ public class NotesList extends ListActivity {
 
         // 搜索note
         // 显示搜索框
+        // todo:搜索框不显示
         final FloatingActionButton showSearchBtn = (FloatingActionButton) findViewById(R.id.search_note);
         final CardView searchCardView = (CardView) findViewById(R.id.search_bar);
         showSearchBtn.setOnClickListener(new View.OnClickListener() {
