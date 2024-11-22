@@ -12,12 +12,12 @@
         "source": "D:\\CodingPlace\\Android_workplace\\NotePad_new-master\\app\\src\\main\\res\\drawable\\shape_circle.xml"
     },
     {
-        "merged": "D:\\CodingPlace\\Android_workplace\\NotePad_new-master\\app\\build\\intermediates\\res\\merged\\debug\\layout_notelist_main.xml.flat",
-        "source": "D:\\CodingPlace\\Android_workplace\\NotePad_new-master\\app\\src\\main\\res\\layout\\notelist_main.xml"
-    },
-    {
         "merged": "D:\\CodingPlace\\Android_workplace\\NotePad_new-master\\app\\build\\intermediates\\res\\merged\\debug\\drawable_android_star.png.flat",
         "source": "D:\\CodingPlace\\Android_workplace\\NotePad_new-master\\app\\src\\main\\res\\drawable\\android_star.png"
+    },
+    {
+        "merged": "D:\\CodingPlace\\Android_workplace\\NotePad_new-master\\app\\build\\intermediates\\res\\merged\\debug\\layout_notelist_main.xml.flat",
+        "source": "D:\\CodingPlace\\Android_workplace\\NotePad_new-master\\app\\src\\main\\res\\layout\\notelist_main.xml"
     },
     {
         "merged": "D:\\CodingPlace\\Android_workplace\\NotePad_new-master\\app\\build\\intermediates\\res\\merged\\debug\\drawable_live_folder_notes.png.flat",
@@ -68,12 +68,12 @@
         "source": "D:\\CodingPlace\\Android_workplace\\NotePad_new-master\\app\\src\\main\\res\\drawable\\android_add.png"
     },
     {
-        "merged": "D:\\CodingPlace\\Android_workplace\\NotePad_new-master\\app\\build\\intermediates\\res\\merged\\debug\\drawable-ldpi_app_notes.png.flat",
-        "source": "D:\\CodingPlace\\Android_workplace\\NotePad_new-master\\app\\src\\main\\res\\drawable-ldpi\\app_notes.png"
-    },
-    {
         "merged": "D:\\CodingPlace\\Android_workplace\\NotePad_new-master\\app\\build\\intermediates\\res\\merged\\debug\\drawable_android_not_star.png.flat",
         "source": "D:\\CodingPlace\\Android_workplace\\NotePad_new-master\\app\\src\\main\\res\\drawable\\android_not_star.png"
+    },
+    {
+        "merged": "D:\\CodingPlace\\Android_workplace\\NotePad_new-master\\app\\build\\intermediates\\res\\merged\\debug\\drawable-ldpi_app_notes.png.flat",
+        "source": "D:\\CodingPlace\\Android_workplace\\NotePad_new-master\\app\\src\\main\\res\\drawable-ldpi\\app_notes.png"
     },
     {
         "merged": "D:\\CodingPlace\\Android_workplace\\NotePad_new-master\\app\\build\\intermediates\\res\\merged\\debug\\drawable_ic_menu_delete.png.flat",
