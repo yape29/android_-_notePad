@@ -63,7 +63,7 @@ public class NotePadProvider extends ContentProvider implements PipeDataWriter<C
     /**
      * The database version
      */
-    private static final int DATABASE_VERSION = 3;
+    private static final int DATABASE_VERSION = 4;
 
     /**
      * A projection map used to select columns from the database
@@ -173,10 +173,15 @@ public class NotePadProvider extends ContentProvider implements PipeDataWriter<C
         // Maps "NAME" to "title AS NAME"
         sLiveFolderProjectionMap.put(LiveFolders.NAME, NotePad.Notes.COLUMN_NAME_TITLE + " AS " +
             LiveFolders.NAME);
-    }
-    static {
+
+        // 添加分类表的 URI 匹配
         sUriMatcher.addURI(NotePad.AUTHORITY, "classify", CLASSIFY);
         sUriMatcher.addURI(NotePad.AUTHORITY, "classify/#", CLASSIFY_ID);
+
+        // 添加分类表的映射
+        sNotesProjectionMap.put(NotePad.Classify._ID, NotePad.Classify._ID);
+        sNotesProjectionMap.put(NotePad.Classify.COLUMN_NAME_NAME, NotePad.Classify.COLUMN_NAME_NAME);
+
     }
 
     /**
@@ -231,26 +236,26 @@ public class NotePadProvider extends ContentProvider implements PipeDataWriter<C
                    + newVersion + ", which will destroy all old data");
 
            // Kills the table and existing data
-           //db.execSQL("DROP TABLE IF EXISTS notes");
+           db.execSQL("DROP TABLE IF EXISTS notes");
 
            // Recreates the database with a new version
-           //if (oldVersion < 3) {  // 假设数据库版本号从1升到2
+//           if (oldVersion < 3) {  // 假设数据库版本号从1升到2
 //               String addColumnQuery = "ALTER TABLE " + NotePad.Notes.TABLE_NAME + " ADD COLUMN " + NotePad.Notes.COLUMN_NAME_STAR + " INTEGER DEFAULT 0";
 //               db.execSQL(addColumnQuery);
-           //if (oldVersion < 2) {
-               // 添加 classify_name 字段
-               db.execSQL("ALTER TABLE " + NotePad.Notes.TABLE_NAME + " ADD COLUMN "
-                       + NotePad.Notes.COLUMN_NAME_CLASSIFY_NAME + " TEXT;");
+//           //if (oldVersion < 2) {
+//               // 添加 classify_name 字段
+//               db.execSQL("ALTER TABLE " + NotePad.Notes.TABLE_NAME + " ADD COLUMN "
+//                       + NotePad.Notes.COLUMN_NAME_CLASSIFY_NAME + " TEXT;");
+//           //}
+//           //if (oldVersion < 3) {
+//               // 创建 classify 表
+//               db.execSQL("CREATE TABLE " + NotePad.Classify.TABLE_NAME + " ("
+//                       + NotePad.Classify._ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
+//                       + NotePad.Classify.COLUMN_NAME_NAME + " TEXT UNIQUE NOT NULL"
+//                       + ");");
+//           }
            //}
-           //if (oldVersion < 3) {
-               // 创建 classify 表
-               db.execSQL("CREATE TABLE " + NotePad.Classify.TABLE_NAME + " ("
-                       + NotePad.Classify._ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
-                       + NotePad.Classify.COLUMN_NAME_NAME + " TEXT UNIQUE NOT NULL"
-                       + ");");
-           //}
-           //}
-           //onCreate(db);
+           onCreate(db);
        }
    }
 
@@ -286,7 +291,7 @@ public class NotePadProvider extends ContentProvider implements PipeDataWriter<C
 
        // Constructs a new query builder and sets its table name
        SQLiteQueryBuilder qb = new SQLiteQueryBuilder();
-       qb.setTables(NotePad.Notes.TABLE_NAME);
+       // qb.setTables(NotePad.Notes.TABLE_NAME);
 
        /**
         * Choose the projection and adjust the "where" clause based on URI pattern-matching.
@@ -294,6 +299,7 @@ public class NotePadProvider extends ContentProvider implements PipeDataWriter<C
        switch (sUriMatcher.match(uri)) {
            // If the incoming URI is for notes, chooses the Notes projection
            case NOTES:
+               qb.setTables(NotePad.Notes.TABLE_NAME);
                qb.setProjectionMap(sNotesProjectionMap);
                break;
 
@@ -302,6 +308,7 @@ public class NotePadProvider extends ContentProvider implements PipeDataWriter<C
             * it selects that single note
             */
            case NOTE_ID:
+               qb.setTables(NotePad.Notes.TABLE_NAME);
                qb.setProjectionMap(sNotesProjectionMap);
                qb.appendWhere(
                    NotePad.Notes._ID +    // the name of the ID column
@@ -311,18 +318,17 @@ public class NotePadProvider extends ContentProvider implements PipeDataWriter<C
                break;
 
            case LIVE_FOLDER_NOTES:
+               qb.setTables(NotePad.Notes.TABLE_NAME);
                // If the incoming URI is from a live folder, chooses the live folder projection.
                qb.setProjectionMap(sLiveFolderProjectionMap);
                break;
            case CLASSIFY:
                qb.setTables(NotePad.Classify.TABLE_NAME);
+               if (sortOrder == null) {
+                   sortOrder = NotePad.Classify.DEFAULT_SORT_ORDER;
+               }
                break;
 
-           case CLASSIFY_ID:
-               qb.setTables(NotePad.Classify.TABLE_NAME);
-               qb.appendWhere(NotePad.Classify._ID + "=" +
-                       uri.getPathSegments().get(1));
-               break;
 
            default:
                // If the URI doesn't match any of the known patterns, throw an exception.
@@ -538,91 +544,59 @@ public class NotePadProvider extends ContentProvider implements PipeDataWriter<C
      */
     @Override
     public Uri insert(Uri uri, ContentValues initialValues) {
-
-        // Validates the incoming URI. Only the full provider URI is allowed for inserts.
-        if (sUriMatcher.match(uri) != NOTES) {
-            throw new IllegalArgumentException("Unknown URI " + uri);
-        }
-
-
-        // A map to hold the new record's values.
         ContentValues values;
-
-        // If the incoming values map is not null, uses it for the new values.
         if (initialValues != null) {
             values = new ContentValues(initialValues);
-
         } else {
-            // Otherwise, create a new value map
             values = new ContentValues();
         }
 
-        // Gets the current system time in milliseconds
-        Long now = Long.valueOf(System.currentTimeMillis());
-
-        // If the values map doesn't contain the creation date, sets the value to the current time.
-        if (values.containsKey(NotePad.Notes.COLUMN_NAME_CREATE_DATE) == false) {
-            values.put(NotePad.Notes.COLUMN_NAME_CREATE_DATE, now);
-        }
-
-        // If the values map doesn't contain the modification date, sets the value to the current
-        // time.
-        if (values.containsKey(NotePad.Notes.COLUMN_NAME_MODIFICATION_DATE) == false) {
-            values.put(NotePad.Notes.COLUMN_NAME_MODIFICATION_DATE, now);
-        }
-
-        // If the values map doesn't contain a title, sets the value to the default title.
-        if (values.containsKey(NotePad.Notes.COLUMN_NAME_TITLE) == false) {
-            Resources r = Resources.getSystem();
-            values.put(NotePad.Notes.COLUMN_NAME_TITLE, r.getString(android.R.string.untitled));
-        }
-
-        // If the values map doesn't contain note text, sets the value to an empty string.
-        if (values.containsKey(NotePad.Notes.COLUMN_NAME_NOTE) == false) {
-            values.put(NotePad.Notes.COLUMN_NAME_NOTE, "");
-        }
-
-        // 如果未包含收藏字段，将其设置为0，未收藏
-        if (!values.containsKey(NotePad.Notes.COLUMN_NAME_STAR)) {
-            values.put(NotePad.Notes.COLUMN_NAME_STAR, 0); // 默认未收藏
-        }
-
-
-
-        // Opens the database object in "write" mode.
         SQLiteDatabase db = mOpenHelper.getWritableDatabase();
+        Uri returnUri;
+        long rowId;
 
-        if (sUriMatcher.match(uri) == CLASSIFY) {
-            long rowId = db.insert(NotePad.Classify.TABLE_NAME, null, initialValues);
-            if (rowId > 0) {
-                Uri classifyUri = ContentUris.withAppendedId(NotePad.Classify.CONTENT_URI, rowId);
-                getContext().getContentResolver().notifyChange(classifyUri, null);
-                return classifyUri;
-            }
-            throw new SQLException("Failed to insert row into " + uri);
+        switch (sUriMatcher.match(uri)) {
+            case CLASSIFY:
+                // 插入分类
+                rowId = db.insert(NotePad.Classify.TABLE_NAME, null, values);
+                if (rowId > 0) {
+                    returnUri = ContentUris.withAppendedId(NotePad.Classify.CONTENT_URI, rowId);
+                    getContext().getContentResolver().notifyChange(returnUri, null);
+                    return returnUri;
+                }
+                throw new SQLException("Failed to insert row into " + uri);
+
+            case NOTES:
+                // 设置笔记的创建时间
+                Long now = Long.valueOf(System.currentTimeMillis());
+                if (values.containsKey(NotePad.Notes.COLUMN_NAME_CREATE_DATE) == false) {
+                    values.put(NotePad.Notes.COLUMN_NAME_CREATE_DATE, now);
+                }
+
+                if (values.containsKey(NotePad.Notes.COLUMN_NAME_MODIFICATION_DATE) == false) {
+                    values.put(NotePad.Notes.COLUMN_NAME_MODIFICATION_DATE, now);
+                }
+
+                if (values.containsKey(NotePad.Notes.COLUMN_NAME_TITLE) == false) {
+                    Resources r = Resources.getSystem();
+                    values.put(NotePad.Notes.COLUMN_NAME_TITLE, r.getString(android.R.string.untitled));
+                }
+
+                if (values.containsKey(NotePad.Notes.COLUMN_NAME_NOTE) == false) {
+                    values.put(NotePad.Notes.COLUMN_NAME_NOTE, "");
+                }
+
+                rowId = db.insert(NotePad.Notes.TABLE_NAME, null, values);
+                if (rowId > 0) {
+                    returnUri = ContentUris.withAppendedId(NotePad.Notes.CONTENT_ID_URI_BASE, rowId);
+                    getContext().getContentResolver().notifyChange(returnUri, null);
+                    return returnUri;
+                }
+                throw new SQLException("Failed to insert row into " + uri);
+
+            default:
+                throw new IllegalArgumentException("Unknown URI " + uri);
         }
-
-        // Performs the insert and returns the ID of the new note.
-        long rowId = db.insert(
-            NotePad.Notes.TABLE_NAME,        // The table to insert into.
-            NotePad.Notes.COLUMN_NAME_NOTE,  // A hack, SQLite sets this column value to null
-                                             // if values is empty.
-            values                           // A map of column names, and the values to insert
-                                             // into the columns.
-        );
-
-        // If the insert succeeded, the row ID exists.
-        if (rowId > 0) {
-            // Creates a URI with the note ID pattern and the new row ID appended to it.
-            Uri noteUri = ContentUris.withAppendedId(NotePad.Notes.CONTENT_ID_URI_BASE, rowId);
-
-            // Notifies observers registered against this provider that the data changed.
-            getContext().getContentResolver().notifyChange(noteUri, null);
-            return noteUri;
-        }
-
-        // If the insert didn't succeed, then the rowID is <= 0. Throws an exception.
-        throw new SQLException("Failed to insert row into " + uri);
     }
 
     /**
@@ -687,6 +661,19 @@ public class NotePadProvider extends ContentProvider implements PipeDataWriter<C
                     finalWhere,                // The final WHERE clause
                     whereArgs                  // The incoming where clause values.
                 );
+                break;
+            case CLASSIFY:
+                // 处理分类表的删除
+                count = db.delete(NotePad.Classify.TABLE_NAME, where, whereArgs);
+                break;
+
+            case CLASSIFY_ID:
+                // 处理单个分类的删除
+                String classifyId = uri.getPathSegments().get(1);
+                count = db.delete(NotePad.Classify.TABLE_NAME,
+                        NotePad.Classify._ID + "=" + classifyId
+                                + (!TextUtils.isEmpty(where) ? " AND (" + where + ')' : ""),
+                        whereArgs);
                 break;
 
             // If the incoming pattern is invalid, throws an exception.

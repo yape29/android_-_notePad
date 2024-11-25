@@ -67,6 +67,7 @@ drawable ic_menu_revert
 drawable ic_menu_save
 drawable live_folder_notes
 drawable shape_circle
+id add_classify
 id add_note
 id cardView
 id classify_contain
