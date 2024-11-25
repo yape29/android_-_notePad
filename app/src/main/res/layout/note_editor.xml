@@ -93,6 +93,13 @@
         app:fab_addButtonSize="normal">
 
         <com.getbase.floatingactionbutton.FloatingActionButton
+            android:id="@+id/add_classify"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:fab_icon="@drawable/android_classify"
+            android:layout_marginBottom="8dp" />
+
+        <com.getbase.floatingactionbutton.FloatingActionButton
             android:id="@+id/save_note"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

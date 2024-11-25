@@ -17,20 +17,25 @@
 package com.example.android.notepad;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.database.Cursor;
+import android.database.SQLException;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Bundle;
+import android.text.InputType;
+import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.Menu;
@@ -38,8 +43,12 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.getbase.floatingactionbutton.FloatingActionButton;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This Activity handles "editing" a note, where editing is responding to
@@ -266,6 +275,14 @@ public class NoteEditor extends Activity {
                 finish();
             }
         });
+        // 分类按钮
+        FloatingActionButton fabAddClassify = (FloatingActionButton) findViewById(R.id.add_classify);
+        fabAddClassify.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showClassifyDialog();
+            }
+        });
         /*
          * If this Activity had stopped previously, its state was written the ORIGINAL_CONTENT
          * location in the saved Instance state. This gets the state.
@@ -275,6 +292,129 @@ public class NoteEditor extends Activity {
         }
     }
 
+    // 显示分类选择对话框
+    private void showClassifyDialog() {
+        // 查询所有分类
+        Cursor cursor = getContentResolver().query(
+                NotePad.Classify.CONTENT_URI,
+                new String[]{NotePad.Classify.COLUMN_NAME_NAME},
+                null,
+                null,
+                NotePad.Classify.DEFAULT_SORT_ORDER
+        );
+
+        final List<String> classifyList = new ArrayList<>();
+        if (cursor != null && cursor.moveToFirst()) {
+            do {
+                classifyList.add(cursor.getString(0));
+            } while (cursor.moveToNext());
+            cursor.close();
+        }
+
+        // 获取当前笔记的分类
+        String currentClassify = "";
+        if (mCursor != null) {
+            // 确保重新查询以获取最新数据
+            mCursor.requery();
+            if (mCursor.moveToFirst()) {
+                int columnIndex = mCursor.getColumnIndex(NotePad.Notes.COLUMN_NAME_CLASSIFY_NAME);
+                if (columnIndex != -1) {
+                    String classify = mCursor.getString(columnIndex);
+                    if (classify != null) {
+                        currentClassify = classify;
+                    }
+                }
+            }
+        }
+
+        // 创建对话框
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("选择分类");
+
+        // 如果没有分类，显示提示
+        if (classifyList.isEmpty()) {
+            builder.setMessage("暂无分类，请先添加分类");
+//            builder.setPositiveButton("添加分类", new DialogInterface.OnClickListener() {
+//                @Override
+//                public void onClick(DialogInterface dialog, int which) {
+//                    showAddClassifyDialog();
+//                }
+//            });
+        } else {
+            // 创建分类选择列表
+            final String[] items = classifyList.toArray(new String[0]);
+            int checkedItem = -1;
+            // 查找当前分类在列表中的位置
+            if (!TextUtils.isEmpty(currentClassify)) {
+                for (int i = 0; i < items.length; i++) {
+                    if (currentClassify.equals(items[i])) {
+                        checkedItem = i;
+                        break;
+                    }
+                }
+            }
+
+            builder.setSingleChoiceItems(items, checkedItem, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    String selectedClassify = items[which];
+                    updateNoteClassify(selectedClassify);
+                    dialog.dismiss();
+                }
+            });
+        }
+
+
+        builder.setNeutralButton("添加新分类", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                showAddClassifyDialog();
+            }
+        });
+
+        builder.setNegativeButton("取消", null);
+        builder.show();
+    }
+
+    // 显示添加分类对话框
+    private void showAddClassifyDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("添加新分类");
+
+        final EditText input = new EditText(this);
+        input.setInputType(InputType.TYPE_CLASS_TEXT);
+        builder.setView(input);
+
+        builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                String newClassify = input.getText().toString().trim();
+                if (!TextUtils.isEmpty(newClassify)) {
+                    // 插入新分类
+                    ContentValues values = new ContentValues();
+                    values.put(NotePad.Classify.COLUMN_NAME_NAME, newClassify);
+                    try {
+                        getContentResolver().insert(NotePad.Classify.CONTENT_URI, values);
+                        // 更新当前笔记的分类
+                        updateNoteClassify(newClassify);
+                    } catch (SQLException e) {
+                        Toast.makeText(NoteEditor.this, "该分类已存在", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            }
+        });
+        builder.setNegativeButton("取消", null);
+
+        builder.show();
+    }
+
+    // 更新笔记分类
+    private void updateNoteClassify(String classify) {
+        ContentValues values = new ContentValues();
+        values.put(NotePad.Notes.COLUMN_NAME_CLASSIFY_NAME, classify);
+        getContentResolver().update(mUri, values, null, null);
+        Toast.makeText(this, "已更新分类: " + classify, Toast.LENGTH_SHORT).show();
+    }
     /**
      * This method is called when the Activity is about to come to the foreground. This happens
      * when the Activity comes to the top of the task stack, OR when it is first starting.
@@ -438,17 +578,17 @@ public class NoteEditor extends Activity {
         // This puts the desired notes text into the map.
         values.put(NotePad.Notes.COLUMN_NAME_NOTE, text);
 
-        /*
-         * Updates the provider with the new values in the map. The ListView is updated
-         * automatically. The provider sets this up by setting the notification URI for
-         * query Cursor objects to the incoming URI. The content resolver is thus
-         * automatically notified when the Cursor for the URI changes, and the UI is
-         * updated.
-         * Note: This is being done on the UI thread. It will block the thread until the
-         * update completes. In a sample app, going against a simple provider based on a
-         * local database, the block will be momentary, but in a real app you should use
-         * android.content.AsyncQueryHandler or android.os.AsyncTask.
-         */
+        // 保持现有的分类不变
+        if (mCursor != null && mCursor.moveToFirst()) {
+            int columnIndex = mCursor.getColumnIndex(NotePad.Notes.COLUMN_NAME_CLASSIFY_NAME);
+            if (columnIndex != -1) {
+                String classify = mCursor.getString(columnIndex);
+                if (classify != null) {
+                    values.put(NotePad.Notes.COLUMN_NAME_CLASSIFY_NAME, classify);
+                }
+            }
+        }
+
         getContentResolver().update(
                 mUri,    // The URI for the record to update.
                 values,  // The map of column names and new values to apply to them.

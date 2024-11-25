@@ -1,14 +1,19 @@
-com/example/android/notepad/NotePadProvider.java
- com.example.android.notepad.NotePadProvider
- com.example.android.notepad.NotePadProvider$DatabaseHelper
+com/example/android/notepad/MyAdapter.java
+ com.example.android.notepad.MyAdapter
+ com.example.android.notepad.MyAdapter$1
 com/example/android/notepad/BuildConfig.java
  com.example.android.notepad.BuildConfig
 com/example/android/notepad/NotePad.java
  com.example.android.notepad.NotePad
+ com.example.android.notepad.NotePad$Classify
  com.example.android.notepad.NotePad$Notes
-com/example/android/notepad/MyAdapter.java
- com.example.android.notepad.MyAdapter
- com.example.android.notepad.MyAdapter$1
+com/getbase/floatingactionbutton/R.java
+ com.getbase.floatingactionbutton.R
+ com.getbase.floatingactionbutton.R$attr
+ com.getbase.floatingactionbutton.R$dimen
+ com.getbase.floatingactionbutton.R$drawable
+ com.getbase.floatingactionbutton.R$id
+ com.getbase.floatingactionbutton.R$styleable
 androidx/cardview/R.java
  androidx.cardview.R
  androidx.cardview.R$attr
@@ -32,22 +37,30 @@ com/example/android/notepad/NoteEditor.java
  com.example.android.notepad.NoteEditor
  com.example.android.notepad.NoteEditor$1
  com.example.android.notepad.NoteEditor$2
+ com.example.android.notepad.NoteEditor$3
+ com.example.android.notepad.NoteEditor$4
+ com.example.android.notepad.NoteEditor$5
+ com.example.android.notepad.NoteEditor$6
  com.example.android.notepad.NoteEditor$LinedEditText
 com/example/android/notepad/NotesLiveFolder.java
  com.example.android.notepad.NotesLiveFolder
-com/getbase/floatingactionbutton/R.java
- com.getbase.floatingactionbutton.R
- com.getbase.floatingactionbutton.R$attr
- com.getbase.floatingactionbutton.R$dimen
- com.getbase.floatingactionbutton.R$drawable
- com.getbase.floatingactionbutton.R$id
- com.getbase.floatingactionbutton.R$styleable
+com/example/android/notepad/NotePadProvider.java
+ com.example.android.notepad.NotePadProvider
+ com.example.android.notepad.NotePadProvider$DatabaseHelper
 com/example/android/notepad/NotesList.java
  com.example.android.notepad.NotesList
  com.example.android.notepad.NotesList$1
+ com.example.android.notepad.NotesList$10
+ com.example.android.notepad.NotesList$11
+ com.example.android.notepad.NotesList$12
+ com.example.android.notepad.NotesList$13
+ com.example.android.notepad.NotesList$14
+ com.example.android.notepad.NotesList$14$1
  com.example.android.notepad.NotesList$2
  com.example.android.notepad.NotesList$3
  com.example.android.notepad.NotesList$4
  com.example.android.notepad.NotesList$5
  com.example.android.notepad.NotesList$6
  com.example.android.notepad.NotesList$7
+ com.example.android.notepad.NotesList$8
+ com.example.android.notepad.NotesList$9

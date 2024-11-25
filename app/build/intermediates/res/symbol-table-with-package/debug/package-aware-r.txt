@@ -47,6 +47,7 @@ dimen fab_size_mini
 dimen fab_size_normal
 dimen fab_stroke_width
 drawable android_add
+drawable android_classify
 drawable android_close
 drawable android_done
 drawable android_more
@@ -66,8 +67,11 @@ drawable ic_menu_revert
 drawable ic_menu_save
 drawable live_folder_notes
 drawable shape_circle
+id add_classify
 id add_note
 id cardView
+id classify_contain
+id classify_name
 id context_copy
 id context_delete
 id context_open
@@ -93,12 +97,14 @@ id save_note
 id search_bar
 id search_button
 id search_note
+id show_classify
 id show_star_note
 id textDate
 id textTitle
 id title
 id title_search
 id up
+layout classifylist_item
 layout note_editor
 layout notelist_item4
 layout notelist_main

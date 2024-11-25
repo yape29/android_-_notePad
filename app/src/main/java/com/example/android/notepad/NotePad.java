@@ -148,6 +148,11 @@ public final class NotePad {
         public static final String COLUMN_NAME_STAR = "star";
 
         /**
+         * 分类
+         */
+        public static final String COLUMN_NAME_CLASSIFY_NAME = "classify_name";
+
+        /**
          * Column name for the creation timestamp
          * <P>Type: INTEGER (long from System.curentTimeMillis())</P>
          */
@@ -159,4 +164,26 @@ public final class NotePad {
          */
         public static final String COLUMN_NAME_MODIFICATION_DATE = "modified";
     }
+
+    public static final class Classify implements BaseColumns {
+
+        private Classify() {}
+
+        public static final String TABLE_NAME = "classify";
+
+        public static final String COLUMN_NAME_NAME = "name";
+
+        public static final String DEFAULT_SORT_ORDER = "name ASC";
+
+        // URI 定义
+        private static final String PATH_CLASSIFY = "/classify";
+        public static final Uri CONTENT_URI =
+                Uri.parse("content://" + AUTHORITY + PATH_CLASSIFY);
+
+        public static final String CONTENT_TYPE =
+                "vnd.android.cursor.dir/vnd.google.classify";
+        public static final String CONTENT_ITEM_TYPE =
+                "vnd.android.cursor.item/vnd.google.classify";
+    }
+
 }

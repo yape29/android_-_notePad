@@ -22,14 +22,17 @@ import static com.example.android.notepad.NotePad.Notes.COLUMN_NAME_STAR;
 import com.example.android.notepad.NotePad;
 import com.getbase.floatingactionbutton.FloatingActionButton;
 
+import android.app.AlertDialog;
 import android.app.ListActivity;
 import android.content.ClipboardManager;
 import android.content.ClipData;
 import android.content.ComponentName;
 import android.content.ContentUris;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
+import android.database.MatrixCursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.Editable;
@@ -78,6 +81,16 @@ public class NotesList extends ListActivity {
     // For logging and debugging
     private static final String TAG = "NotesList";
 
+    // 默认显示笔记视图
+    private boolean isShowingClassify = false;
+
+    // 添加一个变量来标识当前是否只显示收藏的 notes
+    final boolean[] isShowingFavorites = {false};
+
+    // 添加标志来跟踪当前是否在分类下的笔记列表中
+    private boolean isInClassifyNotes = false;
+    private String currentClassifyName = null;
+
     /**
      * The columns needed by the cursor adapter
      */
@@ -98,7 +111,9 @@ public class NotesList extends ListActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        // 初始化标志
+        isInClassifyNotes = false;
+        currentClassifyName = null;
         // list布局加载
         setContentView(R.layout.notelist_main);
         // 新增note
@@ -113,29 +128,14 @@ public class NotesList extends ListActivity {
         });
 
         // 搜索note
-        // 显示搜索框
-        final FloatingActionButton showSearchBtn = (FloatingActionButton) findViewById(R.id.search_note);
-        final CardView searchCardView = (CardView) findViewById(R.id.search_bar);
-        showSearchBtn.setOnClickListener(new View.OnClickListener() {
+        searchNote();
+
+        // 展示分类
+        FloatingActionButton showClassifyButton = (FloatingActionButton) findViewById(R.id.show_classify);
+        showClassifyButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (searchCardView.getVisibility() == View.GONE){
-                    searchCardView.setVisibility(View.VISIBLE);  // 显示搜索框
-
-                }else {
-                    searchCardView.setVisibility(View.GONE);
-                }
-            }
-        });
-
-        // 设置搜索按钮点击事件
-        final EditText searchEditText = (EditText) findViewById(R.id.title_search);
-        ImageButton searchBtn = (ImageButton) findViewById(R.id.search_button);
-        searchBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                String query = searchEditText.getText().toString().trim();
-                searchNotes(query); // 执行搜索
+                toggleView();
             }
         });
 
@@ -200,53 +200,17 @@ public class NotesList extends ListActivity {
             = new MyAdapter(
                       this,                             // The Context for the ListView
                       R.layout.notelist_item4,          // Points to the XML for a list item
-                cursor[0],                           // The cursor to get items from
+                      cursor[0],                           // The cursor to get items from
                       dataColumns,
-                      viewIDs
+                      viewIDs,
+                      false
               );
 
         // Sets the ListView's adapter to be the cursor adapter that was just created.
         setListAdapter(adapter);
 
-        // 设置多选模式
         final ListView listView = getListView();
-        listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
-
-        listView.setMultiChoiceModeListener(new AbsListView.MultiChoiceModeListener() {
-            @Override
-            public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) {
-                adapter.setItemSelected(position, checked);
-
-                int checkedCount = listView.getCheckedItemCount();
-                if (checkedCount > 0) {
-                    findViewById(R.id.delete_notes).setVisibility(View.VISIBLE);
-                } else {
-                    findViewById(R.id.delete_notes).setVisibility(View.GONE);
-                }
-
-                mode.setTitle(checkedCount + " selected");
-            }
-
-            @Override
-            public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-                return true; // 不需要显示菜单
-            }
-
-            @Override
-            public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-                return false;
-            }
-
-            @Override
-            public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-                return false;
-            }
-
-            @Override
-            public void onDestroyActionMode(ActionMode mode) {
-            }
-        });
-
+        setupMultiChoiceMode(adapter); // 设置多选模式
         final FloatingActionButton fabDelete = (FloatingActionButton) findViewById(R.id.delete_notes);
         // 设置删除按钮点击事件
         fabDelete.setOnClickListener(new View.OnClickListener() {
@@ -266,43 +230,106 @@ public class NotesList extends ListActivity {
                 fabDelete.setVisibility(View.GONE);
             }
         });
-        // 添加一个变量来标识当前是否只显示收藏的 notes
-        final boolean[] isShowingFavorites = {false};
+
 
         // 收藏按钮事件
+        showStaredNotes(cursor, adapter, currentClassifyName);
+        // 事件戳
+        timeShow(adapter);
+    }
+
+    private void searchNote() {
+        // 显示搜索框
+        final FloatingActionButton showSearchBtn = (FloatingActionButton) findViewById(R.id.search_note);
+        final CardView searchCardView = (CardView) findViewById(R.id.search_bar);
+        showSearchBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (searchCardView.getVisibility() == View.GONE){
+                    searchCardView.setVisibility(View.VISIBLE);  // 显示搜索框
+
+                }else {
+                    searchCardView.setVisibility(View.GONE);
+                }
+            }
+        });
+
+        // 设置搜索按钮点击事件
+        final EditText searchEditText = (EditText) findViewById(R.id.title_search);
+        ImageButton searchBtn = (ImageButton) findViewById(R.id.search_button);
+        searchBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String query = searchEditText.getText().toString().trim();
+                searchNotes(query); // 执行搜索
+            }
+        });
+    }
+
+    private void showStaredNotes(final Cursor[] cursor, final MyAdapter adapter, final String currentClassifyName) {
         final FloatingActionButton showStarNote = (FloatingActionButton) findViewById(R.id.show_star_note);
         showStarNote.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (isShowingFavorites[0]) {
-                    // 如果当前显示的是收藏的笔记，点击后切换到显示全部笔记
+                    // 切换到显示全部笔记
                     isShowingFavorites[0] = false;
-                    // 查询所有的 notes
-                    cursor[0] = managedQuery(
-                            getIntent().getData(), // 默认 URI
-                            PROJECTION, // 显示的列
-                            null, // 不加筛选条件，查询所有
-                            null, // 参数为空
-                            NotePad.Notes.DEFAULT_SORT_ORDER // 排序
-                    );
+
+                    if (currentClassifyName != null) {
+                        // 在分类下显示所有笔记
+                        cursor[0] = getContentResolver().query(
+                                getIntent().getData(),
+                                PROJECTION,
+                                NotePad.Notes.COLUMN_NAME_CLASSIFY_NAME + "=?",
+                                new String[]{currentClassifyName},
+                                NotePad.Notes.DEFAULT_SORT_ORDER
+                        );
+                    } else {
+                        // 显示所有笔记
+                        cursor[0] = managedQuery(
+                                getIntent().getData(),
+                                PROJECTION,
+                                null,
+                                null,
+                                NotePad.Notes.DEFAULT_SORT_ORDER
+                        );
+                    }
                 } else {
-                    // 如果当前显示的是所有笔记，点击后切换到只显示收藏的笔记
+                    // 切换到只显示收藏的笔记
                     isShowingFavorites[0] = true;
-                    // 查询只显示收藏的 notes (假设 star = 1 表示已收藏)
-                    cursor[0] = managedQuery(
-                            getIntent().getData(), // 默认 URI
-                            PROJECTION, // 显示的列
-                            NotePad.Notes.COLUMN_NAME_STAR + " = ?", // 筛选条件，star = 1
-                            new String[] { "1" }, // 只获取收藏的笔记
-                            NotePad.Notes.DEFAULT_SORT_ORDER // 排序
-                    );
+
+                    if (currentClassifyName != null) {
+                        // 在分类下只显示收藏的笔记
+                        String selection = NotePad.Notes.COLUMN_NAME_STAR + "=? AND "
+                                + NotePad.Notes.COLUMN_NAME_CLASSIFY_NAME + "=?";
+                        String[] selectionArgs = new String[]{"1", currentClassifyName};
+
+                        cursor[0] = getContentResolver().query(
+                                getIntent().getData(),
+                                PROJECTION,
+                                selection,
+                                selectionArgs,
+                                NotePad.Notes.DEFAULT_SORT_ORDER
+                        );
+                    } else {
+                        // 显示所有收藏的笔记
+                        cursor[0] = managedQuery(
+                                getIntent().getData(),
+                                PROJECTION,
+                                NotePad.Notes.COLUMN_NAME_STAR + "=?",
+                                new String[]{"1"},
+                                NotePad.Notes.DEFAULT_SORT_ORDER
+                        );
+                    }
                 }
 
                 // 更新 ListView 的数据
                 adapter.changeCursor(cursor[0]);
             }
         });
+    }
 
+    private static void timeShow(MyAdapter adapter) {
         // 设置自定义视图绑定器，用于修改时间格式显示。这里使用内部类来实现SimpleCursorAdapter.ViewBinder接口。
         adapter.setViewBinder(new SimpleCursorAdapter.ViewBinder() {
             @Override
@@ -336,6 +363,7 @@ public class NotesList extends ListActivity {
             }
         });
     }
+
     private void getNotes(String query) {
         String selection = null;
         String[] selectionArgs = null;
@@ -382,6 +410,219 @@ public class NotesList extends ListActivity {
         MyAdapter adapter = (MyAdapter) getListAdapter();
         adapter.changeCursor(cursor);
     }
+
+    // 修改 toggleView 方法
+    private void toggleView() {
+        if (isShowingClassify) {
+            // 切换到笔记视图
+            showNotes();
+        } else {
+            // 切换到分类视图
+            showClassify();
+        }
+    }
+    private void showClassify() {
+        // 查询所有分类
+        Cursor classifyCursor = getContentResolver().query(
+                NotePad.Classify.CONTENT_URI,
+                new String[]{NotePad.Classify._ID, NotePad.Classify.COLUMN_NAME_NAME},
+                null,
+                null,
+                NotePad.Classify.DEFAULT_SORT_ORDER
+        );
+
+        // 创建一个新的 MatrixCursor 来存储带有笔记数量的分类数据
+        String[] columns = new String[]{
+                NotePad.Classify._ID,
+                NotePad.Classify.COLUMN_NAME_NAME,
+                "note_count" // 添加笔记数量列
+        };
+        MatrixCursor matrixCursor = new MatrixCursor(columns);
+
+        if (classifyCursor != null && classifyCursor.moveToFirst()) {
+            do {
+                long classifyId = classifyCursor.getLong(
+                        classifyCursor.getColumnIndex(NotePad.Classify._ID));
+                String classifyName = classifyCursor.getString(
+                        classifyCursor.getColumnIndex(NotePad.Classify.COLUMN_NAME_NAME));
+
+                // 查询该分类下的笔记数量
+                Cursor notesCountCursor = getContentResolver().query(
+                        NotePad.Notes.CONTENT_URI,
+                        new String[]{"COUNT(*) AS count"},
+                        NotePad.Notes.COLUMN_NAME_CLASSIFY_NAME + "=?",
+                        new String[]{classifyName},
+                        null
+                );
+
+                int noteCount = 0;
+                if (notesCountCursor != null && notesCountCursor.moveToFirst()) {
+                    noteCount = notesCountCursor.getInt(0);
+                    notesCountCursor.close();
+                }
+
+                // 将数据添加到 MatrixCursor
+                matrixCursor.addRow(new Object[]{classifyId, classifyName, noteCount});
+            } while (classifyCursor.moveToNext());
+            classifyCursor.close();
+        }
+
+        // 创建适配器
+        MyAdapter adapter = new MyAdapter(
+                this,
+                R.layout.classifylist_item,
+                matrixCursor,
+                new String[]{NotePad.Classify.COLUMN_NAME_NAME, "note_count"},
+                new int[]{R.id.classify_name, R.id.classify_contain},
+                true
+        );
+
+        // 设置 ViewBinder 来自定义显示格式
+        adapter.setViewBinder(new SimpleCursorAdapter.ViewBinder() {
+            @Override
+            public boolean setViewValue(View view, Cursor cursor, int columnIndex) {
+                if (view.getId() == R.id.classify_contain) {
+                    TextView textView = (TextView) view;
+                    int count = cursor.getInt(columnIndex);
+                    textView.setText(count + "个笔记");
+                    return true;
+                }
+                return false;
+            }
+        });
+
+        setListAdapter(adapter);
+        setupClassifyMultiChoiceMode(adapter);
+        // 设置列表项点击事件
+        getListView().setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Cursor cursor = (Cursor) parent.getItemAtPosition(position);
+                String classifyName = cursor.getString(
+                        cursor.getColumnIndex(NotePad.Classify.COLUMN_NAME_NAME));
+
+                // 显示该分类下的笔记
+                showNotesInClassify(classifyName);
+            }
+        });
+
+        // 更新状态
+        isShowingClassify = true;
+    }
+    private void showNotes() {
+        // 查询所有笔记
+        Cursor[] cursor = {getContentResolver().query(
+                NotePad.Notes.CONTENT_URI,
+                PROJECTION,
+                null,
+                null,
+                NotePad.Notes.DEFAULT_SORT_ORDER
+        )};
+
+        String[] dataColumns = {NotePad.Notes.COLUMN_NAME_TITLE, COLUMN_NAME_MODIFICATION_DATE};
+        int[] viewIDs = {R.id.textTitle, R.id.textDate};
+
+        MyAdapter adapter = new MyAdapter(
+                this,
+                R.layout.notelist_item4,
+                cursor[0],
+                dataColumns,
+                viewIDs,
+                false
+        );
+
+        setListAdapter(adapter);
+        timeShow(adapter);
+        setupMultiChoiceMode(adapter); // 设置多选模式
+        // 重置标题
+        setTitle(R.string.app_name);
+
+        // 设置笔记列表的点击事件
+        getListView().setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                // 构造新的 URI，包含笔记 ID
+                Uri uri = ContentUris.withAppendedId(getIntent().getData(), id);
+
+                // 获取当前 Intent 的 action
+                String action = getIntent().getAction();
+
+                // 处理不同的 action
+                if (Intent.ACTION_PICK.equals(action) || Intent.ACTION_GET_CONTENT.equals(action)) {
+                    // 返回选中的笔记 URI
+                    setResult(RESULT_OK, new Intent().setData(uri));
+                } else {
+                    // 打开笔记编辑界面
+                    startActivity(new Intent(Intent.ACTION_EDIT, uri));
+                }
+            }
+        });
+
+        // 更新状态
+        isShowingClassify = false;
+        isInClassifyNotes = false;
+        currentClassifyName = null;
+        showStaredNotes(cursor, adapter, currentClassifyName);
+
+    }
+    // 显示指定分类下的笔记
+    // 显示指定分类下的笔记
+    private void showNotesInClassify(String classifyName) {
+        // 设置标志，表示进入了分类下的笔记列表
+        isInClassifyNotes = true;
+        currentClassifyName = classifyName;
+        setTitle("分类：" + classifyName);
+        // 查询指定分类下的笔记
+        Cursor[] cursor = {getContentResolver().query(
+                NotePad.Notes.CONTENT_URI,
+                PROJECTION,
+                NotePad.Notes.COLUMN_NAME_CLASSIFY_NAME + "=?",
+                new String[]{classifyName},
+                NotePad.Notes.DEFAULT_SORT_ORDER
+        )};
+
+        // 创建适配器
+        String[] dataColumns = {NotePad.Notes.COLUMN_NAME_TITLE, COLUMN_NAME_MODIFICATION_DATE};
+        int[] viewIDs = {R.id.textTitle, R.id.textDate};
+
+        MyAdapter adapter = new MyAdapter(
+                this,
+                R.layout.notelist_item4,
+                cursor[0],
+                dataColumns,
+                viewIDs,
+                false
+        );
+
+        setListAdapter(adapter);
+        showStaredNotes(cursor, adapter, currentClassifyName);
+        timeShow(adapter);
+        setupMultiChoiceMode(adapter); // 设置多选模式
+        // 更新状态
+        isShowingClassify = false;
+
+        // 设置列表项点击事件
+        getListView().setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                // 构造新的 URI，包含笔记 ID
+                Uri uri = ContentUris.withAppendedId(getIntent().getData(), id);
+
+                // 获取当前 Intent 的 action
+                String action = getIntent().getAction();
+
+                // 处理不同的 action
+                if (Intent.ACTION_PICK.equals(action) || Intent.ACTION_GET_CONTENT.equals(action)) {
+                    // 返回选中的笔记 URI
+                    setResult(RESULT_OK, new Intent().setData(uri));
+                } else {
+                    // 打开笔记编辑界面
+                    startActivity(new Intent(Intent.ACTION_EDIT, uri));
+                }
+            }
+        });
+    }
+
     /**
      * This method is called when the user clicks a note in the displayed list.
      *
@@ -414,5 +655,157 @@ public class NotesList extends ListActivity {
             // Intent's data is the note ID URI. The effect is to call NoteEdit.
             startActivity(new Intent(Intent.ACTION_EDIT, uri));
         }
+    }
+    @Override
+    public void onBackPressed() {
+        if (isInClassifyNotes) {
+            // 如果当前在分类下的笔记列表中，返回到分类视图
+            showClassify();
+            isInClassifyNotes = false;
+            currentClassifyName = null;
+        } else {
+            // 否则执行默认的返回操作
+            super.onBackPressed();
+        }
+    }
+    // 将多选模式设置抽取为一个方法
+    private void setupMultiChoiceMode(final MyAdapter adapter) {
+        final ListView listView = getListView();
+        listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
+
+        listView.setMultiChoiceModeListener(new AbsListView.MultiChoiceModeListener() {
+            @Override
+            public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) {
+                adapter.setItemSelected(position, checked);
+
+                int checkedCount = listView.getCheckedItemCount();
+                if (checkedCount > 0) {
+                    findViewById(R.id.delete_notes).setVisibility(View.VISIBLE);
+                } else {
+                    findViewById(R.id.delete_notes).setVisibility(View.GONE);
+                }
+
+                mode.setTitle(checkedCount + " selected");
+            }
+
+            @Override
+            public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+                return true;
+            }
+
+            @Override
+            public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+                return false;
+            }
+
+            @Override
+            public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+                return false;
+            }
+
+            @Override
+            public void onDestroyActionMode(ActionMode mode) {
+                adapter.clearSelection();
+                findViewById(R.id.delete_notes).setVisibility(View.GONE);
+            }
+        });
+    }
+    // 为分类视图添加多选模式
+    private void setupClassifyMultiChoiceMode(final MyAdapter adapter) {
+        final ListView listView = getListView();
+        listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
+
+        listView.setMultiChoiceModeListener(new AbsListView.MultiChoiceModeListener() {
+            @Override
+            public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) {
+                adapter.setItemSelected(position, checked);
+
+                int checkedCount = listView.getCheckedItemCount();
+                if (checkedCount > 0) {
+                    findViewById(R.id.delete_notes).setVisibility(View.VISIBLE);
+                } else {
+                    findViewById(R.id.delete_notes).setVisibility(View.GONE);
+                }
+
+                mode.setTitle(checkedCount + " selected");
+            }
+
+            @Override
+            public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+                return true;
+            }
+
+            @Override
+            public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+                return false;
+            }
+
+            @Override
+            public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+                return false;
+            }
+
+            @Override
+            public void onDestroyActionMode(ActionMode mode) {
+                adapter.clearSelection();
+                findViewById(R.id.delete_notes).setVisibility(View.GONE);
+            }
+        });
+
+        // 设置删除按钮点击事件
+        final FloatingActionButton fabDelete = (FloatingActionButton) findViewById(R.id.delete_notes);
+        fabDelete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // 显示确认对话框
+                new AlertDialog.Builder(NotesList.this)
+                        .setTitle("删除分类")
+                        .setMessage("确定要删除选中的分类吗？这将同时删除分类下的所有笔记。")
+                        .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                deleteSelectedClassifies(listView, adapter);
+                            }
+                        })
+                        .setNegativeButton("取消", null)
+                        .show();
+            }
+        });
+    }
+    private void deleteSelectedClassifies(ListView listView, MyAdapter adapter) {
+        SparseBooleanArray checkedItems = listView.getCheckedItemPositions();
+        for (int i = 0; i < checkedItems.size(); i++) {
+            int position = checkedItems.keyAt(i);
+            if (checkedItems.valueAt(i)) {
+                Cursor cursor = (Cursor) adapter.getItem(position);
+                String classifyName = cursor.getString(
+                        cursor.getColumnIndex(NotePad.Classify.COLUMN_NAME_NAME));
+
+                try {
+                    // 首先删除该分类下的所有笔记
+                    getContentResolver().delete(
+                            NotePad.Notes.CONTENT_URI,
+                            NotePad.Notes.COLUMN_NAME_CLASSIFY_NAME + "=?",
+                            new String[]{classifyName}
+                    );
+
+                    // 然后删除分类
+                    getContentResolver().delete(
+                            NotePad.Classify.CONTENT_URI,
+                            NotePad.Classify.COLUMN_NAME_NAME + "=?",
+                            new String[]{classifyName}
+                    );
+                } catch (Exception e) {
+                    Log.e("NotesList", "Error deleting classify: " + e.getMessage());
+                }
+            }
+        }
+
+        // 清空选中状态
+        adapter.clearSelection();
+        findViewById(R.id.delete_notes).setVisibility(View.GONE);
+
+        // 刷新分类列表
+        showClassify();
     }
 }

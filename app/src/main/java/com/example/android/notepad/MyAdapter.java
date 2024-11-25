@@ -19,9 +19,11 @@ import java.util.Arrays;
 public class MyAdapter extends SimpleCursorAdapter {
     private SparseBooleanArray selectedItems;
     private Context context; // 保存context
-    public MyAdapter(Context context, int layout, Cursor c, String[] from, int[] to) {
+    private boolean isClassifyView; // 添加标志来区分是否是分类视图
+    public MyAdapter(Context context, int layout, Cursor c, String[] from, int[] to, boolean isClassifyView) {
         super(context, layout, c, from, to);
-        this.context = context; // 保存context
+        this.context = context;
+        this.isClassifyView = isClassifyView;
         selectedItems = new SparseBooleanArray();
     }
 
@@ -38,52 +40,53 @@ public class MyAdapter extends SimpleCursorAdapter {
         } else {
             cardView.setCardBackgroundColor(view.getContext().getResources().getColor(R.color.default_color));
         }
-        // 处理收藏按钮的点击
-        ImageView favoriteButton = (ImageView) view.findViewById(R.id.favoriteButton);
-        handleFavoriteButtonClick(favoriteButton, position);
-
+        // 只在笔记视图中处理收藏按钮
+        if (!isClassifyView) {
+            ImageView favoriteButton = (ImageView) view.findViewById(R.id.favoriteButton);
+            if (favoriteButton != null) {
+                handleFavoriteButtonClick(favoriteButton, position);
+            }
+        }
         return view;
     }
 
-    // 新的方法：处理收藏按钮点击事件
     private void handleFavoriteButtonClick(final ImageView favoriteButton, final int position) {
         final Cursor cursor = (Cursor) getItem(position);
         final long noteId = cursor.getLong(cursor.getColumnIndex(NotePad.Notes._ID));
-        String[] columnNames = cursor.getColumnNames();
-        Log.d("MyAdapter", "Column names: " + Arrays.toString(columnNames));
-        final int isFavorite = cursor.getInt(cursor.getColumnIndex(NotePad.Notes.COLUMN_NAME_STAR));  // 获取当前收藏状态
 
-        // 根据收藏状态更新图标
-        if (isFavorite == 1) {
-            favoriteButton.setImageResource(R.drawable.android_star);  // 收藏状态
-        } else {
-            favoriteButton.setImageResource(R.drawable.android_notstar);  // 未收藏状态
-        }
+        // 确保cursor包含star列
+        int starColumnIndex = cursor.getColumnIndex(NotePad.Notes.COLUMN_NAME_STAR);
+        if (starColumnIndex != -1) {
+            final int isFavorite = cursor.getInt(starColumnIndex);
 
-        // 设置点击事件来更新收藏状态
-        favoriteButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // 切换收藏状态
-                int newStarStatus = (isFavorite == 1) ? 0 : 1;
-
-                // 更新图标
-                if (newStarStatus == 1) {
-                    favoriteButton.setImageResource(R.drawable.android_star);
-                } else {
-                    favoriteButton.setImageResource(R.drawable.android_notstar);
-                }
-
-                // 更新数据库中的收藏状态
-                ContentValues values = new ContentValues();
-                values.put(NotePad.Notes.COLUMN_NAME_STAR, newStarStatus);
-                Uri updateUri = ContentUris.withAppendedId(NotePad.Notes.CONTENT_URI, noteId);
-                context.getContentResolver().update(updateUri, values, null, null); // 更新数据库
-
-                // 更新数据（刷新视图）
-                notifyDataSetChanged();
+            // 设置收藏图标
+            if (isFavorite == 1) {
+                favoriteButton.setImageResource(R.drawable.android_star);
+            } else {
+                favoriteButton.setImageResource(R.drawable.android_notstar);
             }
-        });
+
+            // 设置点击事件
+            favoriteButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    int newStarStatus = (isFavorite == 1) ? 0 : 1;
+
+                    if (newStarStatus == 1) {
+                        favoriteButton.setImageResource(R.drawable.android_star);
+                    } else {
+                        favoriteButton.setImageResource(R.drawable.android_notstar);
+                    }
+
+                    ContentValues values = new ContentValues();
+                    values.put(NotePad.Notes.COLUMN_NAME_STAR, newStarStatus);
+                    Uri updateUri = ContentUris.withAppendedId(NotePad.Notes.CONTENT_URI, noteId);
+                    context.getContentResolver().update(updateUri, values, null, null);
+
+                    notifyDataSetChanged();
+                }
+            });
+        }
     }
 
     // 设置选中项
