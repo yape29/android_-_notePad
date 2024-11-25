@@ -99,6 +99,9 @@ public class NotePadProvider extends ContentProvider implements PipeDataWriter<C
     // The incoming URI matches the Live Folder URI pattern
     private static final int LIVE_FOLDER_NOTES = 3;
 
+    private static final int CLASSIFY = 4;
+    private static final int CLASSIFY_ID = 5;
+
     /**
      * A UriMatcher instance
      */
@@ -171,6 +174,10 @@ public class NotePadProvider extends ContentProvider implements PipeDataWriter<C
         sLiveFolderProjectionMap.put(LiveFolders.NAME, NotePad.Notes.COLUMN_NAME_TITLE + " AS " +
             LiveFolders.NAME);
     }
+    static {
+        sUriMatcher.addURI(NotePad.AUTHORITY, "classify", CLASSIFY);
+        sUriMatcher.addURI(NotePad.AUTHORITY, "classify/#", CLASSIFY_ID);
+    }
 
     /**
     *
@@ -198,7 +205,14 @@ public class NotePadProvider extends ContentProvider implements PipeDataWriter<C
                    + NotePad.Notes.COLUMN_NAME_NOTE + " TEXT,"
                    + NotePad.Notes.COLUMN_NAME_CREATE_DATE + " INTEGER,"
                    + NotePad.Notes.COLUMN_NAME_MODIFICATION_DATE + " INTEGER,"
-                   + NotePad.Notes.COLUMN_NAME_STAR + " INTEGER DEFAULT 0"    // 新增收藏字段，默认为0，未被收藏
+                   + NotePad.Notes.COLUMN_NAME_STAR + " INTEGER DEFAULT 0,"    // 新增收藏字段，默认为0，未被收藏
+                   + NotePad.Notes.COLUMN_NAME_CLASSIFY_NAME + " TEXT" // 新增分类字段
+                   + ");");
+
+           // 创建 classify 表
+           db.execSQL("CREATE TABLE " + NotePad.Classify.TABLE_NAME + " ("
+                   + NotePad.Classify._ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
+                   + NotePad.Classify.COLUMN_NAME_NAME + " TEXT UNIQUE NOT NULL"
                    + ");");
        }
 
@@ -220,9 +234,21 @@ public class NotePadProvider extends ContentProvider implements PipeDataWriter<C
            //db.execSQL("DROP TABLE IF EXISTS notes");
 
            // Recreates the database with a new version
-           //if (oldVersion < 2) {  // 假设数据库版本号从1升到2
-               String addColumnQuery = "ALTER TABLE " + NotePad.Notes.TABLE_NAME + " ADD COLUMN " + NotePad.Notes.COLUMN_NAME_STAR + " INTEGER DEFAULT 0";
-               db.execSQL(addColumnQuery);
+           //if (oldVersion < 3) {  // 假设数据库版本号从1升到2
+//               String addColumnQuery = "ALTER TABLE " + NotePad.Notes.TABLE_NAME + " ADD COLUMN " + NotePad.Notes.COLUMN_NAME_STAR + " INTEGER DEFAULT 0";
+//               db.execSQL(addColumnQuery);
+           //if (oldVersion < 2) {
+               // 添加 classify_name 字段
+               db.execSQL("ALTER TABLE " + NotePad.Notes.TABLE_NAME + " ADD COLUMN "
+                       + NotePad.Notes.COLUMN_NAME_CLASSIFY_NAME + " TEXT;");
+           //}
+           //if (oldVersion < 3) {
+               // 创建 classify 表
+               db.execSQL("CREATE TABLE " + NotePad.Classify.TABLE_NAME + " ("
+                       + NotePad.Classify._ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
+                       + NotePad.Classify.COLUMN_NAME_NAME + " TEXT UNIQUE NOT NULL"
+                       + ");");
+           //}
            //}
            //onCreate(db);
        }
@@ -287,6 +313,15 @@ public class NotePadProvider extends ContentProvider implements PipeDataWriter<C
            case LIVE_FOLDER_NOTES:
                // If the incoming URI is from a live folder, chooses the live folder projection.
                qb.setProjectionMap(sLiveFolderProjectionMap);
+               break;
+           case CLASSIFY:
+               qb.setTables(NotePad.Classify.TABLE_NAME);
+               break;
+
+           case CLASSIFY_ID:
+               qb.setTables(NotePad.Classify.TABLE_NAME);
+               qb.appendWhere(NotePad.Classify._ID + "=" +
+                       uri.getPathSegments().get(1));
                break;
 
            default:
@@ -509,6 +544,7 @@ public class NotePadProvider extends ContentProvider implements PipeDataWriter<C
             throw new IllegalArgumentException("Unknown URI " + uri);
         }
 
+
         // A map to hold the new record's values.
         ContentValues values;
 
@@ -555,6 +591,16 @@ public class NotePadProvider extends ContentProvider implements PipeDataWriter<C
 
         // Opens the database object in "write" mode.
         SQLiteDatabase db = mOpenHelper.getWritableDatabase();
+
+        if (sUriMatcher.match(uri) == CLASSIFY) {
+            long rowId = db.insert(NotePad.Classify.TABLE_NAME, null, initialValues);
+            if (rowId > 0) {
+                Uri classifyUri = ContentUris.withAppendedId(NotePad.Classify.CONTENT_URI, rowId);
+                getContext().getContentResolver().notifyChange(classifyUri, null);
+                return classifyUri;
+            }
+            throw new SQLException("Failed to insert row into " + uri);
+        }
 
         // Performs the insert and returns the ID of the new note.
         long rowId = db.insert(

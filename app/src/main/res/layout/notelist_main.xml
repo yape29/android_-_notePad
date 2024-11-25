@@ -83,6 +83,18 @@
             android:layout_alignParentBottom="true"
             android:layout_marginStart="326dp"
             android:layout_marginBottom="12dp"
+            android:id="@+id/show_classify"
+            app:fab_icon="@drawable/android_classify"
+            app:fab_size="normal"
+            tools:ignore="TouchTargetSizeCheck,SpeakableTextPresentCheck"></com.getbase.floatingactionbutton.FloatingActionButton>
+
+        <com.getbase.floatingactionbutton.FloatingActionButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginStart="326dp"
+            android:layout_marginBottom="12dp"
             android:id="@+id/show_star_note"
             app:fab_icon="@drawable/android_show_star"
             app:fab_size="normal"
