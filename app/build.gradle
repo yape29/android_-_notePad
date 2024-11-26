@@ -41,4 +41,5 @@ dependencies {
     implementation 'androidx.cardview:cardview:1.0.0'
     // 浮动按钮
     implementation 'com.getbase:floatingactionbutton:1.10.1'
+//    implementation 'io.github.everythingme:overscroll-decor-android:1.1.1'
 }

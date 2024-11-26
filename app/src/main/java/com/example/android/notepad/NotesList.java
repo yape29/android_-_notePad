@@ -48,10 +48,12 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
@@ -62,20 +64,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
-/**
- * Displays a list of notes. Will display notes from the {@link Uri}
- * provided in the incoming Intent if there is one, otherwise it defaults to displaying the
- * contents of the {@link NotePadProvider}.
- *
- * NOTE: Notice that the provider operations in this Activity are taking place on the UI thread.
- * This is not a good practice. It is only done here to make the code more readable. A real
- * application should use the {@link android.content.AsyncQueryHandler} or
- * {@link android.os.AsyncTask} object to perform operations asynchronously on a separate thread.
- *
- * 显示注释列表。将显示来自传入 Intent 中提供的 {@link Uri} 的注释（如果有），否则默认显示 {@link NotePadProvider} 的内容。
- * 注意：请注意，此 Activity 中的提供程序操作在 UI 线程上进行。这不是一个好的做法。此处仅为了使代码更具可读性而执行此操作。
- * 实际应用程序应使用 {@link android.content.AsyncQueryHandler} 或 {@link android.os.AsyncTask} 对象在单独的线程上异步执行操作。
- */
 public class NotesList extends ListActivity {
 
     // For logging and debugging
@@ -116,6 +104,7 @@ public class NotesList extends ListActivity {
         currentClassifyName = null;
         // list布局加载
         setContentView(R.layout.notelist_main);
+
         // 新增note
         FloatingActionButton fabAddNote = (FloatingActionButton) findViewById(R.id.add_note);
         fabAddNote.setOnClickListener(new View.OnClickListener() {
@@ -142,35 +131,13 @@ public class NotesList extends ListActivity {
         // The user does not need to hold down the key to use menu shortcuts.
         // 用户无需按住该键即可使用菜单快捷方式。
         setDefaultKeyMode(DEFAULT_KEYS_SHORTCUT);
-
-        /* If no data is given in the Intent that started this Activity, then this Activity
-         * was started when the intent filter matched a MAIN action. We should use the default
-         * provider URI.
-         *
-         * 如果启动此活动的 Intent 中没有提供任何数据，则表示当 Intent 筛选条件与 MAIN 操作匹配时，
-         * 此 Activity 已启动。我们应该使用默认的提供者 URI。
-         */
-        // Gets the intent that started this Activity.
         Intent intent = getIntent();
-
-        // If there is no data associated with the Intent, sets the data to the default URI, which
-        // accesses a list of notes.
         if (intent.getData() == null) {
             intent.setData(NotePad.Notes.CONTENT_URI);
         }
 
-        /*
-         * Sets the callback for context menu activation for the ListView. The listener is set
-         * to be this Activity. The effect is that context menus are enabled for items in the
-         * ListView, and the context menu is handled by a method in NotesList.
-         */
         getListView().setOnCreateContextMenuListener(this);
 
-        /* Performs a managed query. The Activity handles closing and requerying the cursor
-         * when needed.
-         *
-         * Please see the introductory note about performing provider operations on the UI thread.
-         */
         final Cursor[] cursor = {managedQuery(
                 getIntent().getData(),            // Use the default content URI for the provider.
                 PROJECTION,                       // Return the note ID and title for each note.
@@ -179,15 +146,6 @@ public class NotesList extends ListActivity {
                 NotePad.Notes.DEFAULT_SORT_ORDER  // Use the default sort order.
         )};
 
-        /*
-         * The following two arrays create a "map" between columns in the cursor and view IDs
-         * for items in the ListView. Each element in the dataColumns array represents
-         * a column name; each element in the viewID array represents the ID of a View.
-         * The SimpleCursorAdapter maps them in ascending order to determine where each column
-         * value will appear in the ListView.
-         */
-
-        // The names of the cursor columns to display in the view, initialized to the title column
         String[] dataColumns = { NotePad.Notes.COLUMN_NAME_TITLE,
                 COLUMN_NAME_MODIFICATION_DATE } ;
 
@@ -231,38 +189,104 @@ public class NotesList extends ListActivity {
             }
         });
 
-
         // 收藏按钮事件
         showStaredNotes(cursor, adapter, currentClassifyName);
         // 事件戳
         timeShow(adapter);
     }
 
-    private void searchNote() {
-        // 显示搜索框
-        final FloatingActionButton showSearchBtn = (FloatingActionButton) findViewById(R.id.search_note);
-        final CardView searchCardView = (CardView) findViewById(R.id.search_bar);
-        showSearchBtn.setOnClickListener(new View.OnClickListener() {
+    private void searchNote(){
+        FloatingActionButton searchButton = (FloatingActionButton) findViewById(R.id.search_note);
+        final LinearLayout searchLayout = (LinearLayout) findViewById(R.id.search_layout);
+        final ListView listView = getListView();
+        final EditText searchText = (EditText) findViewById(R.id.title_search);
+
+        // 初始化搜索框状态
+        searchLayout.setVisibility(View.INVISIBLE);
+        searchLayout.setTranslationY(-searchLayout.getHeight());
+
+        final boolean[] isSearchVisible = {false};
+
+        searchButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (searchCardView.getVisibility() == View.GONE){
-                    searchCardView.setVisibility(View.VISIBLE);  // 显示搜索框
+                if (!isSearchVisible[0]) {
+                    // 显示搜索框
+                    searchLayout.setVisibility(View.VISIBLE);
 
-                }else {
-                    searchCardView.setVisibility(View.GONE);
+                    // 搜索框下滑动画
+                    searchLayout.animate()
+                            .translationY(0)
+                            .setDuration(300)
+                            .start();
+
+                    // ListView下移动画
+                    listView.animate()
+                            .translationY(searchLayout.getHeight())
+                            .setDuration(300)
+                            .start();
+
+                    // 显示键盘
+                    searchText.requestFocus();
+                    InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                    imm.showSoftInput(searchText, InputMethodManager.SHOW_IMPLICIT);
+                } else {
+                    // 隐藏键盘
+                    InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                    imm.hideSoftInputFromWindow(searchText.getWindowToken(), 0);
+
+                    // 搜索框上滑动画
+                    searchLayout.animate()
+                            .translationY(-searchLayout.getHeight())
+                            .setDuration(300)
+                            .withEndAction(new Runnable() {
+                                @Override
+                                public void run() {
+                                    searchLayout.setVisibility(View.INVISIBLE);
+                                }
+                            })
+                            .start();
+
+                    // ListView恢复位置动画
+                    listView.animate()
+                            .translationY(0)
+                            .setDuration(300)
+                            .start();
+
+                    // 清空搜索内容
+                    searchText.setText("");
                 }
+                isSearchVisible[0] = !isSearchVisible[0];
             }
         });
-
-        // 设置搜索按钮点击事件
-        final EditText searchEditText = (EditText) findViewById(R.id.title_search);
-        ImageButton searchBtn = (ImageButton) findViewById(R.id.search_button);
-        searchBtn.setOnClickListener(new View.OnClickListener() {
+        // 搜索框文本变化监听
+        searchText.addTextChangedListener(new TextWatcher() {
             @Override
-            public void onClick(View view) {
-                String query = searchEditText.getText().toString().trim();
-                searchNotes(query); // 执行搜索
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                String searchString = s.toString();
+                Cursor cursor = getContentResolver().query(
+                        getIntent().getData(),
+                        PROJECTION,
+                        NotePad.Notes.COLUMN_NAME_TITLE + " LIKE ?",
+                        new String[]{"%" + searchString + "%"},
+                        NotePad.Notes.DEFAULT_SORT_ORDER
+                );
+                String[] dataColumns = {NotePad.Notes.COLUMN_NAME_TITLE, COLUMN_NAME_MODIFICATION_DATE};
+                int[] viewIDs = {R.id.textTitle, R.id.textDate};
+                MyAdapter adapter = new MyAdapter(
+                        NotesList.this,
+                        R.layout.notelist_item4,
+                        cursor,
+                        dataColumns,
+                        viewIDs,
+                        false
+                );
+                setListAdapter(adapter);
             }
+            @Override
+            public void afterTextChanged(Editable s) {}
         });
     }
 

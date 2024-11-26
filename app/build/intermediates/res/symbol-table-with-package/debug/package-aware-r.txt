@@ -105,6 +105,7 @@ id right
 id save_note
 id search_bar
 id search_button
+id search_layout
 id search_note
 id show_classify
 id show_star_note
