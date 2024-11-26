@@ -58,6 +58,9 @@ drawable android_search2
 drawable android_show_star
 drawable android_star
 drawable app_notes
+drawable dialog_background
+drawable dialog_button_background
+drawable edit_text_background
 drawable fab_bg_mini
 drawable fab_bg_normal
 drawable ic_menu_compose
@@ -69,15 +72,21 @@ drawable live_folder_notes
 drawable shape_circle
 id add_classify
 id add_note
+id btn_add_new
+id btn_cancel
+id btn_confirm
 id cardView
 id classify_contain
+id classify_list
 id classify_name
 id context_copy
 id context_delete
 id context_open
 id delete_note
 id delete_notes
+id dialog_title
 id down
+id edit_classify_name
 id fab_expand_menu_button
 id fab_label
 id fab_menu
@@ -104,6 +113,8 @@ id textTitle
 id title
 id title_search
 id up
+layout add_classify_dialog
+layout classify_dialog
 layout classifylist_item
 layout note_editor
 layout notelist_item4
@@ -135,6 +146,7 @@ style Base_CardView
 style CardView
 style CardView_Dark
 style CardView_Light
+style dialog_style
 styleable AddFloatingActionButton fab_plusIconColor
 styleable CardView android_minWidth android_minHeight cardBackgroundColor cardCornerRadius cardElevation cardMaxElevation cardPreventCornerOverlap cardUseCompatPadding contentPadding contentPaddingBottom contentPaddingLeft contentPaddingRight contentPaddingTop
 styleable FloatingActionButton fab_colorDisabled fab_colorNormal fab_colorPressed fab_icon fab_size fab_stroke_visible fab_title
