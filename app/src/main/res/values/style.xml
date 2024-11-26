@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 对话框样式 -->
+    <style name="dialog_style" parent="android:Theme.Dialog">
+        <!-- 完全透明背景 -->
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowIsTranslucent">true</item>
+        <!-- 无标题 -->
+        <item name="android:windowNoTitle">true</item>
+        <!-- 浮动 -->
+        <item name="android:windowIsFloating">true</item>
+        <!-- 禁用背景变暗 -->
+        <item name="android:backgroundDimEnabled">false</item>
+        <!-- 移除所有窗口装饰 -->
+        <item name="android:windowFrame">@null</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <!-- 设置完全透明 -->
+        <item name="android:colorBackgroundCacheHint">@null</item>
+        <item name="android:windowShowWallpaper">false</item>
+        <item name="android:windowCloseOnTouchOutside">true</item>
+    </style>
+</resources>

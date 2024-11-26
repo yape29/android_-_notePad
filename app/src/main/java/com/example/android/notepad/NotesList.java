@@ -663,6 +663,9 @@ public class NotesList extends ListActivity {
             showClassify();
             isInClassifyNotes = false;
             currentClassifyName = null;
+        } else if (isShowingClassify) {
+            // 如果当前在分类视图中，返回到笔记视图
+            showNotes();
         } else {
             // 否则执行默认的返回操作
             super.onBackPressed();
