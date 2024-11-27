@@ -3,23 +3,23 @@
 
 这是一个基于Android原生[NotePad](https://github.com/llfjfz/NotePad)应用程序进行功能扩展的笔记本应用。在保留原有的笔记创建、编辑、删除等基础功能上，增加了笔记分类、搜索、收藏等实用功能，并进行UI统一设计美化。  
 ## 项目结构
-app/
-├── src/
-│ ├── main/
-│ │ ├── java/com/example/android/notepad/
-│ │ │ ├── NoteEditor.java		       # 笔记编辑界面
-│ │ │ ├── NotesList.java 			# 笔记列表界面
-│ │ │ ├── NotePadProvider.java	      # 数据访问提供者
-│ │ │ └── NotePad.java			  # 常量定义
-│ │ │ └── MyAdapter				# 自定义适配器
-│ │ ├── res/
-│ │ │ ├── layout/ # 界面布局文件
-│ │ │ ├── drawable/ # 图片资源
-│ │ │ ├── values/ # 资源文件
-│ │ │ └── menu/ # 菜单文件
-│ │ └── AndroidManifest.xml # 应用配置文件
-│ └── test/ # 测试代码目录
-└── build.gradle # 项目构建配置
+app/  
+├── src/  
+│ ├── main/  
+│ │ ├── java/com/example/android/notepad/  
+│ │ │ ├── NoteEditor.java		       # 笔记编辑界面  
+│ │ │ ├── NotesList.java 			# 笔记列表界面  
+│ │ │ ├── NotePadProvider.java	      # 数据访问提供者  
+│ │ │ └── NotePad.java			  # 常量定义  
+│ │ │ └── MyAdapter				# 自定义适配器  
+│ │ ├── res/  
+│ │ │ ├── layout/ # 界面布局文件  
+│ │ │ ├── drawable/ # 图片资源  
+│ │ │ ├── values/ # 资源文件  
+│ │ │ └── menu/ # 菜单文件  
+│ │ └── AndroidManifest.xml # 应用配置文件  
+│ └── test/ # 测试代码目录  
+└── build.gradle # 项目构建配置  
 
 ## 功能特点
 - 基础功能
