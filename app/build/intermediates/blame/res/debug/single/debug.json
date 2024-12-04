@@ -4,20 +4,20 @@
         "source": "D:\\CodingPlace\\Android_workplace\\NotePad_new-master\\app\\src\\main\\res\\drawable\\android_show_star.png"
     },
     {
-        "merged": "D:\\CodingPlace\\Android_workplace\\NotePad_new-master\\app\\build\\intermediates\\res\\merged\\debug\\drawable_android_classify.png.flat",
-        "source": "D:\\CodingPlace\\Android_workplace\\NotePad_new-master\\app\\src\\main\\res\\drawable\\android_classify.png"
-    },
-    {
         "merged": "D:\\CodingPlace\\Android_workplace\\NotePad_new-master\\app\\build\\intermediates\\res\\merged\\debug\\drawable_shape_circle.xml.flat",
         "source": "D:\\CodingPlace\\Android_workplace\\NotePad_new-master\\app\\src\\main\\res\\drawable\\shape_circle.xml"
     },
     {
-        "merged": "D:\\CodingPlace\\Android_workplace\\NotePad_new-master\\app\\build\\intermediates\\res\\merged\\debug\\drawable_android_star.png.flat",
-        "source": "D:\\CodingPlace\\Android_workplace\\NotePad_new-master\\app\\src\\main\\res\\drawable\\android_star.png"
+        "merged": "D:\\CodingPlace\\Android_workplace\\NotePad_new-master\\app\\build\\intermediates\\res\\merged\\debug\\drawable_android_classify.png.flat",
+        "source": "D:\\CodingPlace\\Android_workplace\\NotePad_new-master\\app\\src\\main\\res\\drawable\\android_classify.png"
     },
     {
         "merged": "D:\\CodingPlace\\Android_workplace\\NotePad_new-master\\app\\build\\intermediates\\res\\merged\\debug\\layout_notelist_main.xml.flat",
         "source": "D:\\CodingPlace\\Android_workplace\\NotePad_new-master\\app\\src\\main\\res\\layout\\notelist_main.xml"
+    },
+    {
+        "merged": "D:\\CodingPlace\\Android_workplace\\NotePad_new-master\\app\\build\\intermediates\\res\\merged\\debug\\drawable_android_star.png.flat",
+        "source": "D:\\CodingPlace\\Android_workplace\\NotePad_new-master\\app\\src\\main\\res\\drawable\\android_star.png"
     },
     {
         "merged": "D:\\CodingPlace\\Android_workplace\\NotePad_new-master\\app\\build\\intermediates\\res\\merged\\debug\\drawable_live_folder_notes.png.flat",

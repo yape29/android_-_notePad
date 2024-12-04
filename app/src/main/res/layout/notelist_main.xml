@@ -80,59 +80,6 @@
         android:overScrollMode="always"/>
 
 
-<!--    &lt;!&ndash;  搜索框  &ndash;&gt;-->
-<!--    <androidx.cardview.widget.CardView-->
-<!--        android:id="@+id/search_bar"-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="50dp"-->
-<!--        android:layout_marginStart="16dp"-->
-<!--        android:layout_marginEnd="16dp"-->
-<!--        android:layout_marginTop="8dp"-->
-<!--        android:layout_marginBottom="8dp"-->
-<!--        app:cardBackgroundColor="#CCfafafa"-->
-<!--        app:contentPaddingTop="5dp"-->
-<!--        app:contentPaddingLeft="2dp"-->
-<!--        app:contentPaddingRight="5dp"-->
-
-<!--        app:cardCornerRadius="25dp"-->
-<!--        app:cardElevation="10dp"-->
-<!--        android:visibility="gone">-->
-
-<!--        <LinearLayout-->
-<!--            android:layout_width="360dp"-->
-<!--            android:layout_height="match_parent"-->
-<!--            android:layout_marginStart="10dp"-->
-<!--            android:layout_marginEnd="50dp"-->
-<!--            android:layout_marginBottom="5dp"-->
-<!--            android:orientation="horizontal"-->
-<!--            android:padding="0dp">-->
-
-<!--            <EditText-->
-<!--                android:id="@+id/title_search"-->
-<!--                android:layout_width="0dp"-->
-<!--                android:layout_height="40dp"-->
-<!--                android:layout_weight="1"-->
-<!--                android:background="@null"-->
-<!--                android:hint="标题"-->
-<!--                android:inputType="text"-->
-<!--                android:maxLength="20"-->
-<!--                android:maxLines="1"-->
-<!--                android:scrollbars="none"-->
-<!--                android:textSize="22sp"-->
-<!--                android:textColor="#000000"/>-->
-<!--            &lt;!&ndash; Search Button &ndash;&gt;-->
-<!--            <ImageButton-->
-<!--                android:id="@+id/search_button"-->
-<!--                android:layout_width="40dp"-->
-<!--                android:layout_height="40dp"-->
-<!--                android:layout_marginStart="8dp"-->
-<!--                android:background="@null"-->
-<!--                android:src="@drawable/android_search2"-->
-<!--                android:contentDescription="Search"-->
-<!--                android:layout_gravity="center_vertical" />-->
-<!--        </LinearLayout>-->
-<!--    </androidx.cardview.widget.CardView>-->
-
     <com.getbase.floatingactionbutton.FloatingActionsMenu
         android:id="@+id/fab_menu"
         android:layout_width="wrap_content"

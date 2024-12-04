@@ -436,15 +436,15 @@ public class NotesList extends ListActivity {
     }
 
     // 修改 toggleView 方法
-    private void toggleView() {
-        if (isShowingClassify) {
-            // 切换到笔记视图
-            showNotes();
-        } else {
-            // 切换到分类视图
-            showClassify();
+        private void toggleView() {
+            if (isShowingClassify) {
+                // 切换到笔记视图
+                showNotes();
+            } else {
+                // 切换到分类视图
+                showClassify();
+            }
         }
-    }
     private void showClassify() {
         // 查询所有分类
         Cursor classifyCursor = getContentResolver().query(

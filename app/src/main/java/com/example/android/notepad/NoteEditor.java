@@ -298,7 +298,7 @@ public class NoteEditor extends Activity {
     }
 
     // 显示分类选择对话框
-    private void showClassifyDialog() {
+        private void showClassifyDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.dialog_style);
         View dialogView = getLayoutInflater().inflate(R.layout.classify_dialog, null);
 //        builder.setView(dialogView);
@@ -406,7 +406,6 @@ public class NoteEditor extends Activity {
         });
         dialog.show();
         dialog.setContentView(dialogView);
-
     }
 
     // 更新笔记分类

@@ -33,13 +33,8 @@ android {
     }
 }
 dependencies {
-    //classpath 'com.android.tools.build:gradle:2.1.2'
-    //classpath "com.android.tools.build:gradle:3.5.0"
-    //classpath 'com.android.tools.build:gradle:4.2.2'
-        //api 'androidx.cardview:cardview:1.0.0'
     // card布局
     implementation 'androidx.cardview:cardview:1.0.0'
     // 浮动按钮
     implementation 'com.getbase:floatingactionbutton:1.10.1'
-//    implementation 'io.github.everythingme:overscroll-decor-android:1.1.1'
 }
