@@ -1,6 +1,5 @@
-com/example/android/notepad/NotePadProvider.java
- com.example.android.notepad.NotePadProvider
- com.example.android.notepad.NotePadProvider$DatabaseHelper
+com/example/android/notepad/presenter/NoteEditorPresenter.java
+ com.example.android.notepad.presenter.NoteEditorPresenter
 com/example/android/notepad/BuildConfig.java
  com.example.android.notepad.BuildConfig
 com/example/android/notepad/NotePad.java
@@ -29,19 +28,6 @@ com/example/android/notepad/R.java
  com.example.android.notepad.R$string
  com.example.android.notepad.R$style
  com.example.android.notepad.R$styleable
-com/example/android/notepad/NoteEditor.java
- com.example.android.notepad.NoteEditor
- com.example.android.notepad.NoteEditor$1
- com.example.android.notepad.NoteEditor$2
- com.example.android.notepad.NoteEditor$3
- com.example.android.notepad.NoteEditor$4
- com.example.android.notepad.NoteEditor$5
- com.example.android.notepad.NoteEditor$6
- com.example.android.notepad.NoteEditor$7
- com.example.android.notepad.NoteEditor$8
- com.example.android.notepad.NoteEditor$LinedEditText
-com/example/android/notepad/NotesLiveFolder.java
- com.example.android.notepad.NotesLiveFolder
 com/getbase/floatingactionbutton/R.java
  com.getbase.floatingactionbutton.R
  com.getbase.floatingactionbutton.R$attr
@@ -49,6 +35,16 @@ com/getbase/floatingactionbutton/R.java
  com.getbase.floatingactionbutton.R$drawable
  com.getbase.floatingactionbutton.R$id
  com.getbase.floatingactionbutton.R$styleable
+com/example/android/notepad/NotesLiveFolder.java
+ com.example.android.notepad.NotesLiveFolder
+com/example/android/notepad/contract/NotesContract.java
+ com.example.android.notepad.contract.NotesContract
+ com.example.android.notepad.contract.NotesContract$NoteEditorPresenter
+ com.example.android.notepad.contract.NotesContract$NoteEditorView
+ com.example.android.notepad.contract.NotesContract$NotesPresenter
+ com.example.android.notepad.contract.NotesContract$NotesView
+com/example/android/notepad/presenter/NotesPresenter.java
+ com.example.android.notepad.presenter.NotesPresenter
 com/example/android/notepad/NotesList.java
  com.example.android.notepad.NotesList
  com.example.android.notepad.NotesList$1
@@ -67,3 +63,17 @@ com/example/android/notepad/NotesList.java
  com.example.android.notepad.NotesList$7
  com.example.android.notepad.NotesList$8
  com.example.android.notepad.NotesList$9
+com/example/android/notepad/NoteEditor.java
+ com.example.android.notepad.NoteEditor
+ com.example.android.notepad.NoteEditor$1
+ com.example.android.notepad.NoteEditor$2
+ com.example.android.notepad.NoteEditor$3
+ com.example.android.notepad.NoteEditor$4
+ com.example.android.notepad.NoteEditor$5
+ com.example.android.notepad.NoteEditor$6
+ com.example.android.notepad.NoteEditor$7
+ com.example.android.notepad.NoteEditor$8
+ com.example.android.notepad.NoteEditor$LinedEditText
+com/example/android/notepad/NotePadProvider.java
+ com.example.android.notepad.NotePadProvider
+ com.example.android.notepad.NotePadProvider$DatabaseHelper

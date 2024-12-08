@@ -21,6 +21,8 @@ import static com.example.android.notepad.NotePad.Notes.COLUMN_NAME_STAR;
 
 import com.example.android.notepad.NotePad;
 import com.getbase.floatingactionbutton.FloatingActionButton;
+import com.example.android.notepad.contract.NotesContract;
+import com.example.android.notepad.presenter.NotesPresenter;
 
 import android.app.AlertDialog;
 import android.app.ListActivity;
@@ -57,6 +59,7 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.cardview.widget.CardView;
 
@@ -64,7 +67,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
-public class NotesList extends ListActivity {
+public class NotesList extends ListActivity implements NotesContract.NotesView {
 
     // For logging and debugging
     private static final String TAG = "NotesList";
@@ -92,6 +95,8 @@ public class NotesList extends ListActivity {
     /** The index of the title column */
     private static final int COLUMN_INDEX_TITLE = 1;
 
+    private NotesContract.NotesPresenter mPresenter;
+
     /**
      * onCreate is called when Android starts this Activity from scratch.
      * onCreate 在 Android 从头开始启动此活动时调用
@@ -105,14 +110,15 @@ public class NotesList extends ListActivity {
         // list布局加载
         setContentView(R.layout.notelist_main);
 
+        // 初始化Presenter
+        mPresenter = new NotesPresenter(this, this);
+
         // 新增note
         FloatingActionButton fabAddNote = (FloatingActionButton) findViewById(R.id.add_note);
         fabAddNote.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Launch NoteEditor to add a new note
-                Intent intent = new Intent(Intent.ACTION_INSERT, NotePad.Notes.CONTENT_URI);
-                startActivity(intent);
+                mPresenter.createNote();
             }
         });
 
@@ -193,6 +199,9 @@ public class NotesList extends ListActivity {
         showStaredNotes(cursor, adapter, currentClassifyName);
         // 事件戳
         timeShow(adapter);
+
+        // 加载笔记列表
+        mPresenter.loadNotes();
     }
 
     private void searchNote(){
@@ -323,7 +332,7 @@ public class NotesList extends ListActivity {
                     isShowingFavorites[0] = true;
 
                     if (currentClassifyName != null) {
-                        // 在分类下只显示收藏的笔记
+                        // ��分类下只显示收藏的笔记
                         String selection = NotePad.Notes.COLUMN_NAME_STAR + "=? AND "
                                 + NotePad.Notes.COLUMN_NAME_CLASSIFY_NAME + "=?";
                         String[] selectionArgs = new String[]{"1", currentClassifyName};
@@ -354,7 +363,7 @@ public class NotesList extends ListActivity {
     }
 
     private static void timeShow(MyAdapter adapter) {
-        // 设置自定义视图绑定器，用于修改时间格式显示。这里使用内部类来实现SimpleCursorAdapter.ViewBinder接口。
+        // 设置自定义视���绑定器，用于修改时间格式显示。这里使用内部类来实现SimpleCursorAdapter.ViewBinder接口。
         adapter.setViewBinder(new SimpleCursorAdapter.ViewBinder() {
             @Override
             public boolean setViewValue(View view, Cursor cursor, int columnIndex) {
@@ -525,7 +534,7 @@ public class NotesList extends ListActivity {
                 String classifyName = cursor.getString(
                         cursor.getColumnIndex(NotePad.Classify.COLUMN_NAME_NAME));
 
-                // 显示该分类下的笔记
+                // 显示该���类下的笔记
                 showNotesInClassify(classifyName);
             }
         });
@@ -828,11 +837,87 @@ public class NotesList extends ListActivity {
             }
         }
 
-        // 清空选中状态
+        // 清���选中状态
         adapter.clearSelection();
         findViewById(R.id.delete_notes).setVisibility(View.GONE);
 
         // 刷新分类列表
         showClassify();
+    }
+
+    @Override
+    public void showNotes(Cursor cursor) {
+        startManagingCursor(cursor);
+        String[] dataColumns = { NotePad.Notes.COLUMN_NAME_TITLE };
+        int[] viewIDs = { android.R.id.text1 };
+        SimpleCursorAdapter adapter = new SimpleCursorAdapter(
+            this,
+            R.layout.notelist_item4,
+            cursor,
+            dataColumns,
+            viewIDs
+        );
+        setListAdapter(adapter);
+    }
+
+    @Override
+    public void showError(String message) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void openNoteEditor(Uri uri) {
+        startActivity(new Intent(Intent.ACTION_EDIT, uri));
+    }
+
+    @Override
+    public void finishView() {
+        finish();
+    }
+
+    @Override
+    public void refreshView() {
+        mPresenter.loadNotes();
+    }
+
+    @Override
+    public void updateListView(Cursor cursor) {
+        if(isShowingClassify) {
+            // 显示分类列表的适配器
+            MyAdapter adapter = new MyAdapter(
+                this,
+                R.layout.classifylist_item,
+                cursor,
+                new String[]{NotePad.Classify.COLUMN_NAME_NAME},
+                new int[]{R.id.classify_name},
+                true
+            );
+            setListAdapter(adapter);
+        } else {
+            // 显示笔记列表的适配器
+            MyAdapter adapter = new MyAdapter(
+                this,
+                R.layout.notelist_item4,
+                cursor,
+                new String[]{NotePad.Notes.COLUMN_NAME_TITLE, NotePad.Notes.COLUMN_NAME_MODIFICATION_DATE},
+                new int[]{R.id.textTitle, R.id.textDate},
+                false
+            );
+            setListAdapter(adapter);
+            timeShow(adapter);
+        }
+    }
+
+    @Override
+    public void showDeleteButton(boolean show) {
+        findViewById(R.id.delete_notes).setVisibility(show ? View.VISIBLE : View.GONE);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (mPresenter != null) {
+            mPresenter.onDestroy();
+        }
     }
 }

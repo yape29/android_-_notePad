@@ -159,6 +159,9 @@ public class NotePadProvider extends ContentProvider implements PipeDataWriter<C
         sNotesProjectionMap.put(
                 NotePad.Notes.COLUMN_NAME_MODIFICATION_DATE,
                 NotePad.Notes.COLUMN_NAME_MODIFICATION_DATE);
+        sNotesProjectionMap.put(
+                NotePad.Notes.COLUMN_NAME_CLASSIFY_NAME,
+                NotePad.Notes.COLUMN_NAME_CLASSIFY_NAME);
 
         /*
          * Creates an initializes a projection map for handling Live Folders
